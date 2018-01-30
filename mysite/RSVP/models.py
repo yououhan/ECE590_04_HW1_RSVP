@@ -1,20 +1,50 @@
 from django.db import models
 
 QUESTION_TEXT_MAX_LENGTH = 200
+CHOICE_TEXT_MAX_LENGTH = 200
 EVENT_NAME_MAX_LENGTH = 100
+PEOPLE_USERNAME_MAX_LENGTH = 20
+PEOPLE_NAME_MAX_LENGTH = 20
 QUESTION_TYPES_CHOICES = (
     ('S', 'Single select'),
     ('M', 'Multiple select'),
     ('T', 'Text')
 )
+IDENTITY_CHOICES = (
+    ('0', 'Owner'),
+    ('1', 'Vendor'),
+    ('2', 'Guest')
+)
+REGISTER_STATE_CHOICES = (
+    ('0', 'Pending'),
+    ('1', 'Passed'),
+    ('2', 'Declined and unread'),
+    ('3', 'Declined and read')
+)    
 # Create your models here.
+class People(models.Model):
+    username = models.CharField(max_length = PEOPLE_USERNAME_MAX_LENGTH)
+    name = models.CharField(max_length = PEOPLE_NAME_MAX_LENGTH)
+#    password = 
+#    hashString
+
+class Event(models.Model):
+    event_name = models.CharField(max_length = EVENT_NAME_MAX_LENGTH)
+    creator = models.ForeignKey(
+        People,
+        null = True,
+        on_delete=models.SET_NULL#Set the reference to NULL (requires the field to be nullable). For instance, when you delete a User, you might want to keep the comments he posted on blog posts, but say it was posted by an anonymous (or deleted) user.
+        )
+    create_time = models.DateTimeField('time created', auto_now_add = True)
+    last_updated_time = models.DateTimeField('last updated time', auto_now = True)
+
 class Question(models.Model):
     event = models.ForeignKey(
         Event,
         on_delete = models.CASCADE
         )
     question_text = models.CharField(max_length = QUESTION_TEXT_MAX_LENGTH)
-    question_type = model.CharField(max_length = 1, choices = QUESTION_TYPES_CHOICES)
+    question_type = models.CharField(max_length = 1, choices = QUESTION_TYPES_CHOICES)
     isEditable = models.BooleanField(default = True)
     isOptional = models.BooleanField(default = False)
     last_updated_time = models.DateTimeField('last updated time', auto_now = True)
@@ -24,22 +54,7 @@ class Choice(models.Model):
         Question,
         on_delete=models.CASCADE#When the referenced object is deleted, also delete the objects that have references to it (When you remove a blog post for instance, you might want to delete comments as well).
         )
-    choice_text = 
-
-class Event(models.Model):
-    event_name = models.CharField(max_length = EVENT_NAME_MAX_LENGTH)
-    creator = models.ForeignKey(
-        People,
-        on_delete=models.SET_NULL#Set the reference to NULL (requires the field to be nullable). For instance, when you delete a User, you might want to keep the comments he posted on blog posts, but say it was posted by an anonymous (or deleted) user.
-        )
-    create_time = models.DateTimeField('time created', auto_now_add = True)
-    last_updated_time = models.DateTimeField('last updated time', auto_now = True)
-
-class People(models.Model):
-    username = models.CharField(max_length = PEOPLE_USERNAME_MAX_LENGTH)
-    name = models.CharField(max_length = PEOPLE_NAME_MAX_LENGTH)
-    password = 
-    hashString
+    choice_text = models.CharField(max_length = CHOICE_TEXT_MAX_LENGTH)
 
 class RegisterEvent(models.Model):
     event = models.ForeignKey(#same event can not be registered twice by the same people!!!
@@ -51,19 +66,19 @@ class RegisterEvent(models.Model):
         on_delete=models.CASCADE
         )
     register_time = models.DateTimeField('time registered')
-    identity#0: owner, 1: vendor, 2: guest
-    state#0: pending, 1: passed, 2: declined_unread, 3: declined_read
+    identity = models.CharField(max_length = 1, choices = IDENTITY_CHOICES)
+    register_state = models.CharField(max_length = 1, choices = REGISTER_STATE_CHOICES)
 
 class Response(models.Model):
     question = models.ForeignKey(
         Question,
         on_delete=models.CASCADE
         )
-    guest = models.ForeginKey(
+    guest = models.ForeignKey(
         People,
         on_delete=models.CASCADE
         )
-    answer = #???? is choice a foreign key of answer??
+#    answer = #???? is choice a foreign key of answer??
     last_updated_time = models.DateTimeField('last updated time')
 
 class EventAccess(models.Model):
@@ -83,4 +98,4 @@ class QuestionAccess(models.Model):
         Question,
         on_delete=models.CASCADE
         )
-    access 
+    access = models.BooleanField()
