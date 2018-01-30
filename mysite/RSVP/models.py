@@ -1,7 +1,11 @@
 from django.db import models
+from django.db.models import CharField, Model
+from django_mysql.models import ListCharField
+
 
 QUESTION_TEXT_MAX_LENGTH = 200
 CHOICE_TEXT_MAX_LENGTH = 200
+CHOICE_MAX_NUMBER = 10;
 EVENT_NAME_MAX_LENGTH = 100
 PEOPLE_USERNAME_MAX_LENGTH = 20
 PEOPLE_NAME_MAX_LENGTH = 20
@@ -48,13 +52,19 @@ class Question(models.Model):
     isEditable = models.BooleanField(default = True)
     isOptional = models.BooleanField(default = False)
     last_updated_time = models.DateTimeField('last updated time', auto_now = True)
-    
-class Choice(models.Model):
-    question = models.ForeignKey(
-        Question,
-        on_delete=models.CASCADE#When the referenced object is deleted, also delete the objects that have references to it (When you remove a blog post for instance, you might want to delete comments as well).
+    choices = ListCharField(
+        base_field = CharField(max_length = CHOICE_TEXT_MAX_LENGTH),
+        size = CHOICE_MAX_NUMBER,
+        max_length= ((CHOICE_TEXT_MAX_LENGTH + 1)* CHOICE_MAX_NUMBER)
         )
-    choice_text = models.CharField(max_length = CHOICE_TEXT_MAX_LENGTH)
+
+        
+#class Choice(models.Model):
+#    question = models.ForeignKey(
+#        Question,
+#        on_delete=models.CASCADE#When the referenced object is deleted, also delete the objects that have references to it (When you remove a blog post for instance, you might want to delete comments as well).
+#        )
+#    choice_text = models.CharField(max_length = CHOICE_TEXT_MAX_LENGTH)
 
 class RegisterEvent(models.Model):
     event = models.ForeignKey(#same event can not be registered twice by the same people!!!
