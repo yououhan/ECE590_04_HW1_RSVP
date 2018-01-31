@@ -1,7 +1,5 @@
 from django.db import models
-from django.db.models import CharField, Model
-from django_mysql.models import ListCharField
-
+from django.contrib.postgres.fields import ArrayField
 
 QUESTION_TEXT_MAX_LENGTH = 200
 CHOICE_TEXT_MAX_LENGTH = 200
@@ -9,6 +7,8 @@ CHOICE_MAX_NUMBER = 10;
 EVENT_NAME_MAX_LENGTH = 100
 PEOPLE_USERNAME_MAX_LENGTH = 20
 PEOPLE_NAME_MAX_LENGTH = 20
+RESPONSE_ANSWER_MAX_LENGTH = 500
+RESPONSE_ANSWER_MAX_NUMBER = 10
 QUESTION_TYPES_CHOICES = (
     ('S', 'Single select'),
     ('M', 'Multiple select'),
@@ -39,6 +39,7 @@ class Event(models.Model):
         null = True,
         on_delete=models.SET_NULL#Set the reference to NULL (requires the field to be nullable). For instance, when you delete a User, you might want to keep the comments he posted on blog posts, but say it was posted by an anonymous (or deleted) user.
         )
+    event_time = models.DateTimeField('event held time')
     create_time = models.DateTimeField('time created', auto_now_add = True)
     last_updated_time = models.DateTimeField('last updated time', auto_now = True)
 
@@ -52,12 +53,10 @@ class Question(models.Model):
     isEditable = models.BooleanField(default = True)
     isOptional = models.BooleanField(default = False)
     last_updated_time = models.DateTimeField('last updated time', auto_now = True)
-    choices = ListCharField(
-        base_field = CharField(max_length = CHOICE_TEXT_MAX_LENGTH),
+    choices = ArrayField(
+        models.CharField(max_length = CHOICE_TEXT_MAX_LENGTH, blank = True),
         size = CHOICE_MAX_NUMBER,
-        max_length= ((CHOICE_TEXT_MAX_LENGTH + 1)* CHOICE_MAX_NUMBER)
         )
-
         
 #class Choice(models.Model):
 #    question = models.ForeignKey(
@@ -88,7 +87,11 @@ class Response(models.Model):
         People,
         on_delete=models.CASCADE
         )
-#    answer = #???? is choice a foreign key of answer??
+    answer = ArrayField(#does not connnect to the choice!!!!!!
+        models.CharField(max_length = RESPONSE_ANSWER_MAX_LENGTH),
+        size = RESPONSE_ANSWER_MAX_NUMBER
+        )
+        
     last_updated_time = models.DateTimeField('last updated time')
 
 class EventAccess(models.Model):
