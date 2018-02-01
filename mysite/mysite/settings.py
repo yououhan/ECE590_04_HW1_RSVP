@@ -25,7 +25,7 @@ SECRET_KEY = 'zn%jw9px@8hw-*^)qpk$nz5n6=o12%-q-er3pobe@fx-cl&%j4'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['oy5','vcm-2827.vm.duke.edu']
+ALLOWED_HOSTS = ['oy5','vcm-2827.vm.duke.edu','yl475','vcm-3030.vm.duke.edu']
 
 
 # Application definition
