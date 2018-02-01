@@ -57,6 +57,7 @@ class Question(models.Model):
     choices = ArrayField(
         models.CharField(max_length = CHOICE_TEXT_MAX_LENGTH, blank = True),
         size = CHOICE_MAX_NUMBER,
+        null = True
         )
         
 #class Choice(models.Model):
