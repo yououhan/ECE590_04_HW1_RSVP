@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
+from django.utils import timezone
 
 QUESTION_TEXT_MAX_LENGTH = 200
 CHOICE_TEXT_MAX_LENGTH = 200
@@ -39,7 +40,7 @@ class Event(models.Model):
         null = True,
         on_delete=models.SET_NULL#Set the reference to NULL (requires the field to be nullable). For instance, when you delete a User, you might want to keep the comments he posted on blog posts, but say it was posted by an anonymous (or deleted) user.
         )
-    event_time = models.DateTimeField('event held time')
+    event_time = models.DateTimeField('event held time', default = timezone.now)
     create_time = models.DateTimeField('time created', auto_now_add = True)
     last_updated_time = models.DateTimeField('last updated time', auto_now = True)
 
@@ -74,7 +75,7 @@ class RegisterEvent(models.Model):
         People,
         on_delete=models.CASCADE
         )
-    register_time = models.DateTimeField('time registered')
+    register_time = models.DateTimeField('time registered', auto_now_add = True)
     identity = models.CharField(max_length = 1, choices = IDENTITY_CHOICES)
     register_state = models.CharField(max_length = 1, choices = REGISTER_STATE_CHOICES)
 
