@@ -80,7 +80,7 @@ DATABASES = {
         'NAME': 'testdb',
         'USER': 'youEeveent',
         'PASSWORD': '',
-        'HOST': '127.0.0.1',
+        'HOST': 'vcm-2827.vm.duke.edu',
         'PORT': '5432',
     }
 }
