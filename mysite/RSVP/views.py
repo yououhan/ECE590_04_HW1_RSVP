@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404, render
-from .models import Event,People,RegisterEvent
+from .models import Event,People,RegisterEvent,Question
 
 #testing
 def sign_in(request):
@@ -42,6 +42,8 @@ def home(request,people_id):
 def events_list(request, event_id):
     event = get_object_or_404(Event, pk = event_id)
 
+    questions = Question.objects.filter(event=event)
+
     guest = RegisterEvent.objects.filter(event=event,identity=2)
     guestPending = guest.filter(register_state=0)
     guestPass = guest.filter(register_state=1)
@@ -68,7 +70,8 @@ def events_list(request, event_id):
         'ownerNum':ownerNum,
         'vendorPending':vendorPending,
         'vendorPass':vendorPass,
-        'vendorNum':vendorNum
+        'vendorNum':vendorNum,
+        'questions':questions
   #      'user':user
     })
 #pass the event ID here and can use the get object funciton
