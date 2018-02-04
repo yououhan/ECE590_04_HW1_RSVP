@@ -58,21 +58,35 @@
     <div class="mb-3">
       <h2>GuestInfo</h2>
       <h3>
-      	<span>{{guestNum}}</span> guests will attend your <span>eventName</span>
+      	<span>{{guestNum}}</span> guests will attend your <span>{{event_name}}</span>
       </h3>
 <div class="bd-example">
+
 	<div class="dropdown">
   		<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
     	Guets list
   		</button>
   	 	<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-		 {% for people in guest %}
+		 {% for people in guestPass %}
     		 <a class="dropdown-item" href="#">{{people.people}}</a>
 		 {% endfor %}
-        </div>
-        <button type="button" class="btn btn-primary" data-toggle="button" aria-pressed="false" autocomplete="off">
- 		invite new 
+  </div>
+
+    <button type="button" class="btn btn-primary" data-toggle="button" aria-pressed="false" autocomplete="off">
+      invite new 
 		</button>
+  <div class="btn-group">
+  <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+   Pending guests
+  </button>
+  <div class="dropdown-menu">
+    {% for people in guestPending %}
+         <a class="dropdown-item" href="#">{{people.people}}</a>
+    {% endfor %}
+  </div>
+</div>
+
+
 
 	</div>
 </div>
@@ -82,23 +96,37 @@
 <div class="mb-3">
       <h2>vendorInfo</h2>
       <h3>
-      	<span>vendornumber</span> people will vend your <span>eventName</span>
+        <span>{{vendorNum}}</span> vendor will attend your <span>{{event_name}}</span>
       </h3>
 <div class="bd-example">
-	<div class="dropdown">
-  		<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    	vendor list
-  		</button>
-  	 	<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-    	<a class="dropdown-item" href="#">Name1</a>
-   		<a class="dropdown-item" href="#">Name2</a>
-    	<a class="dropdown-item" href="#">Namw3</a>
-        </div>
-          	<button type="button" class="btn btn-primary" data-toggle="	button" aria-pressed="false" autocomplete="off">
-	 		invite new 
-			</button>
 
-	</div>
+  <div class="dropdown">
+      <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      vendor list
+      </button>
+      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+     {% for people in vendorPass %}
+         <a class="dropdown-item" href="#">{{people.people}}</a>
+     {% endfor %}
+  </div>
+
+    <button type="button" class="btn btn-primary" data-toggle="button" aria-pressed="false" autocomplete="off">
+      invite new 
+    </button>
+  <div class="btn-group">
+  <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+   Pending vendor
+  </button>
+  <div class="dropdown-menu">
+    {% for people in vendorPending %}
+         <a class="dropdown-item" href="#">{{people.people}}</a>
+    {% endfor %}
+  </div>
+</div>
+
+
+
+  </div>
 </div>
 <hr>
 
@@ -107,24 +135,43 @@
 <div class="mb-3">
       <h2>OwnerInfo</h2>
       <h3>
-      	<span>Ownernumber</span> people is owning your <span>eventName</span>
+        <span>{{ownerNum}}</span> guests will attend your <span>{{event_name}}</span>
       </h3>
 <div class="bd-example">
-	<div class="dropdown">
-  		<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    	owner list
-  		</button>
-  	 	<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-    	<a class="dropdown-item" href="#">Name1</a>
-   		<a class="dropdown-item" href="#">Name2</a>
-    	<a class="dropdown-item" href="#">Namw3</a>
-        </div>
-         <button type="button" class="btn btn-primary" data-toggle="button" aria-pressed="false" autocomplete="off">
- 		invite new 
-		</button>
-	</div>
+
+  <div class="dropdown">
+      <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      Owner list
+      </button>
+      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+     {% for people in ownerPass %}
+         <a class="dropdown-item" href="#">{{people.people}}</a>
+     {% endfor %}
+  </div>
+
+    <button type="button" class="btn btn-primary" data-toggle="button" aria-pressed="false" autocomplete="off">
+      invite new 
+    </button>
+  <div class="btn-group">
+  <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+   Pending owner
+  </button>
+  <div class="dropdown-menu">
+    {% for people in ownerPending %}
+         <a class="dropdown-item" href="#">{{people.people}}</a>
+    {% endfor %}
+  </div>
+</div>
+
+
+
+  </div>
 </div>
 <hr>
+
+
+
+
 
 <div>
 	<h2>Question</h2>
