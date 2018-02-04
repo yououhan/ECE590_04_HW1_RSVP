@@ -41,10 +41,14 @@ def home(request,people_id):
 
 def events_list(request, event_id):
     event = get_object_or_404(Event, pk = event_id)
+    guest = RegisterEvent.objects.filter(event=event,identity=2)
+    guestNum = guest.count()
  #   user = request.People
     return render(request, 'RSVP/events_list.html', {
         'event_name': event.event_name,
         'event_time': event.event_time,
+        'guest':guest,
+        'guestNum':guestNum
   #      'user':user
     })
 #pass the event ID here and can use the get object funciton

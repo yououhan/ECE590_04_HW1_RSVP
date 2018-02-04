@@ -41,11 +41,14 @@
 <!--the event name and time!!!!!!!!!!!!!!!!!!!!!!!-->
   <div class="container">
     <div class="row">
-      <div class="col-md-6 mb-3">
+      <div class="col-md-4 mb-3">
         <input type="text" class="form-control" placeholder="{{event_name}}" value="" required="">
       </div>
-      <div class="col-md-6 mb-3">
+      <div class="col-md-4 mb-3">
         <input type="text" class="form-control" placeholder="{{event_time}}" value="" required="">
+      </div>
+      <div class="col-md-4 mb-3">
+	<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Save change</button>
       </div>
     </div>
 
@@ -53,9 +56,9 @@
 
 <!--the guestInfo-->
     <div class="mb-3">
-      <h2>GuesInfo</h2>
+      <h2>GuestInfo</h2>
       <h3>
-      	<span>guesnumber</span> guests will attend your <span>eventName</span>
+      	<span>{{guestNum}}</span> guests will attend your <span>eventName</span>
       </h3>
 <div class="bd-example">
 	<div class="dropdown">
@@ -63,14 +66,13 @@
     	Guets list
   		</button>
   	 	<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-    	<a class="dropdown-item" href="#">Name1</a>
-   		<a class="dropdown-item" href="#">Name2</a>
-    	<a class="dropdown-item" href="#">Namw3</a>
+		 {% for people in guest %}
+    		 <a class="dropdown-item" href="#">{{people.people}}</a>
+		 {% endfor %}
         </div>
         <button type="button" class="btn btn-primary" data-toggle="button" aria-pressed="false" autocomplete="off">
  		invite new 
 		</button>
-
 
 	</div>
 </div>
