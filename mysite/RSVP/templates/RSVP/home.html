@@ -53,13 +53,6 @@
     </div>
     <hr>
     
-    <h2>
-      {% for event in ownEventsPending %}
-      <h2>{{ event.event }}</h2>
-      {% endfor %}
-    </h2>
-    <hr>
-   
     <!--the table of events!!!!!!!!!!!!!!!!!-->
 
     <div class="row">
@@ -114,8 +107,9 @@
       <div class="col-md-4">
         <h5>You own those event</h5>
         <p>you can click to edit those events</p>
+	<p><a class="btn btn-secondary" href="#" role="button">creat event &raquo;</a></p>  
         {% for event in ownEvents %}
-           <p><a class="btn btn-secondary" href="#" role="button">{{event.event}} &raquo;</a></p>
+           <p><a class="btn btn-secondary" href="../event/{{event.event.id}}" role="button">{{event.event}} &raquo;</a></p>
         {% endfor %}
       </div>
           
