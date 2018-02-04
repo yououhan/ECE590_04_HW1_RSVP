@@ -24,31 +24,51 @@ def home(request,people_id):
     guest = RegisterEvent.objects.filter(people=people,identity = 2)
     guestPending = guest.filter(register_state = 0)
     guestEvents = guest.filter(register_state = 1)
-    vender = RegisterEvent.objects.filter(people=people,identity = 1)
-    venderPending = vender.filter(register_state = 0)
-    venderEvents = vender.filter(register_state = 1)
+    vendor = RegisterEvent.objects.filter(people=people,identity = 1)
+    vendorPending = vendor.filter(register_state = 0)
+    vendorEvents = vendor.filter(register_state = 1)
     return render(request,'RSVP/home.html',{
         'username' : people.username,
         'ownEventsPending': ownEventsPending,
         'ownEvents':ownEvents,
         'guestPending':guestPending,
         'guestEvents':guestEvents,
-        'venderPending':venderPending,
-        'venderEvents':venderEvents
+        'vendorPending':vendorPending,
+        'vendorEvents':vendorEvents
     })
     # View code here...
 #n    return render(request, 'RSVP/home.html')
 
 def events_list(request, event_id):
     event = get_object_or_404(Event, pk = event_id)
+
     guest = RegisterEvent.objects.filter(event=event,identity=2)
-    guestNum = guest.count()
- #   user = request.People
+    guestPending = guest.filter(register_state=0)
+    guestPass = guest.filter(register_state=1)
+    guestNum = guestPass.count()
+
+    owner = RegisterEvent.objects.filter(event=event,identity=0)
+    ownerPending = owner.filter(register_state=0)
+    ownerPass = owner.filter(register_state=1)
+    ownerNum = ownerPass.count()
+
+    vendor = RegisterEvent.objects.filter(event=event,identity=1)
+    vendorPending = vendor.filter(register_state=0)
+    vendorPass = vendor.filter(register_state=1)
+    vendorNum = vendorPass.count()
+
     return render(request, 'RSVP/events_list.html', {
         'event_name': event.event_name,
         'event_time': event.event_time,
-        'guest':guest,
-        'guestNum':guestNum
+        'guestPending':guestPending,
+        'guestPass':guestPass,
+        'guestNum':guestNum,
+        'ownerPending':ownerPending,
+        'ownerPass':ownerPass,
+        'ownerNum':ownerNum,
+        'vendorPending':vendorPending,
+        'vendorPass':vendorPass,
+        'vendorNum':vendorNum
   #      'user':user
     })
 #pass the event ID here and can use the get object funciton
