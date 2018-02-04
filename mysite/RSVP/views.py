@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404, render
-from .models import Event,People
+from .models import Event,People,RegisterEvent
 
 #testing
 def sign_in(request):
@@ -17,9 +17,24 @@ def sign_in(request):
 
 def home(request,people_id):
     people = get_object_or_404(People,pk = people_id)
+    own =  RegisterEvent.objects.filter(people=people,identity=0)
+    ownEventsPending = own.filter(register_state = 0)
+    ownEvents = own.filter(register_state = 1)
+    # ownHistory = ownEvents.filter(event.event_time < timezone.now)
+    guest = RegisterEvent.objects.filter(people=people,identity = 2)
+    guestPending = guest.filter(register_state = 0)
+    guestEvents = guest.filter(register_state = 1)
+    vender = RegisterEvent.objects.filter(people=people,identity = 1)
+    venderPending = vender.filter(register_state = 0)
+    venderEvents = vender.filter(register_state = 1)
     return render(request,'RSVP/home.html',{
         'username' : people.username,
-        
+        'ownEventsPending': ownEventsPending,
+        'ownEvents':ownEvents,
+        'guestPending':guestPending,
+        'guestEvents':guestEvents,
+        'venderPending':venderPending,
+        'venderEvents':venderEvents
     })
     # View code here...
 #n    return render(request, 'RSVP/home.html')

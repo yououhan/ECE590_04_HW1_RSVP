@@ -63,12 +63,12 @@ class RegisterEvent(models.Model):
         )
     class Meta:
         unique_together = (("event", "people"),)
-    register_time = models.DateTimeField('time registered', auto_now_add = True, null = True)
-    identity = models.CharField(max_length = 1, choices = IDENTITY_CHOICES, null = True)
-    register_state = models.CharField(max_length = 1, choices = REGISTER_STATE_CHOICES)
-    def __str__(self):
+        register_time = models.DateTimeField('time registered', auto_now_add = True, null = True)
+        identity = models.CharField(max_length = 1, choices = IDENTITY_CHOICES, null = True)
+        register_state = models.CharField(max_length = 1, choices = REGISTER_STATE_CHOICES)
+        def __str__(self):
         return '%s registers %s as %s' % (self.people.username, self.event.event_name, self.identity.__str__())
-
+    
 class Question(models.Model):
     event = models.ForeignKey(
         Event,
