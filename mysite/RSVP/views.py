@@ -101,16 +101,16 @@ def signup(request):
         if form.is_valid():
             form.save()
             username = form.cleaned_data.get('username')
-            raw_password = form.cleaned_data.get('password')
-#            User.objects.create_user(username, username + "@gmail.com", raw_password)
+            raw_password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=raw_password)
             if user is not None:
-                login(request, user)
-                return redirect('test')
+                if user.is_active:
+                    login(request, user)
+                    return redirect('../../home')
+                else:
+                    return HttpResponse("this user is not active")
             else:
                 return HttpResponse("failed to authenticate")                
-#            return render(request,'RSVP/test.html')
-#            return render(request, 'RSVP/signup.html', {'form': form})
     else:
         form = UserCreationForm()
     return render(request, 'RSVP/signup.html', {'form': form})
