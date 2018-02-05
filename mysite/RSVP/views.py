@@ -40,7 +40,8 @@ def home(request):
         'guestPending':guestPending,
         'guestEvents':guestEvents,
         'vendorPending':vendorPending,
-        'vendorEvents':vendorEvents
+        'vendorEvents':vendorEvents,
+        'timeNow':timezone.now()
     })
     # View code here...
 #n    return render(request, 'RSVP/home.html')
