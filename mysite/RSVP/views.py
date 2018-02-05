@@ -5,7 +5,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 from django.utils import timezone
-
+from django.contrib.auth import logout
 
 #testing
 def sign_in(request):
@@ -122,3 +122,6 @@ def signup(request):
 
 def test(request):
     return HttpResponse("Hello, world. You're " + request.user.username)
+def logout(request):
+    logout(request)
+    return redirect('../login')
