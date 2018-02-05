@@ -4,6 +4,9 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
+from django.utils import timezone
+
+
 #testing
 def sign_in(request):
     Events = Event.objects.all()
@@ -74,7 +77,9 @@ def events_list(request, event_id):
         'vendorPending':vendorPending,
         'vendorPass':vendorPass,
         'vendorNum':vendorNum,
-        'questions':questions
+        'questions':questions,
+        'timeNow':timezone.now()
+        
   #      'user':user
     })
 #pass the event ID here and can use the get object funciton
