@@ -11,9 +11,10 @@ urlpatterns = [
     path('event/<int:event_id>', views.events_list, name='events_list'),
     path('index', views.index, name = 'index'),
     path('sign_up', views.sign_up, name = 'sign_up'),
-    path('accounts/login/', auth_views.LoginView.as_view(template_name='RSVP/login.html')),    
+    path('accounts/login/', auth_views.LoginView.as_view(template_name='RSVP/login.html')),
+    path('accounts/logout/', views.logout,name = 'logout'),
     path('accounts/signup/', views.signup, name = 'signup'),
     path('accounts/test/', views.test, name = 'test'),
-    path('accounts/profile/', views.test, name = 'profile'),
+#    path('accounts/profile/', views.test, name = 'profile'),
     #    path('accounts/', auth_views.login, name = 'login'),
 ]
