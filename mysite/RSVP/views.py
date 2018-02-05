@@ -6,6 +6,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.contrib.auth import logout
+from .forms import EventForm
 
 #testing
 def sign_in(request):
@@ -47,6 +48,27 @@ def home(request):
 #n    return render(request, 'RSVP/home.html')
 
 def events_list(request, event_id):
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = EventForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            event_name = form.cleaned_data.get('event_name')
+            event_time = form.cleaned_data.get('event_time')
+            event_id = request.event_id
+            obj, created = Event.objects.update_or_create(
+                event_id = event_id, defaults = {'event_name':event_name , 'event_time':event_time},
+            )
+            #return HttpResponse(event_name + event_time)
+            # process the data in form.cleaned_data as required
+            # ...
+            # redirect to a new URL:
+            return HttpResponseRedirect('/RSVP/event/' + event_id)
+        # if a GET (or any other method) we'll create a blank form
+    else:
+        form = EventForm()
+#    return render(request, 'events_list.html', {'form': form})
     event = get_object_or_404(Event, pk = event_id)
 
     questions = Question.objects.filter(event=event)
@@ -79,8 +101,8 @@ def events_list(request, event_id):
         'vendorPass':vendorPass,
         'vendorNum':vendorNum,
         'questions':questions,
-        'timeNow':timezone.now()
-        
+        'timeNow':timezone.now(),
+        'form' : form,
   #      'user':user
     })
 #pass the event ID here and can use the get object funciton
