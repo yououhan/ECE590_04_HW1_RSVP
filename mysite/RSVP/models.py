@@ -1,12 +1,13 @@
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth.models import User
 
 QUESTION_TEXT_MAX_LENGTH = 200
 CHOICE_TEXT_MAX_LENGTH = 200
 CHOICE_MAX_NUMBER = 10;
 EVENT_NAME_MAX_LENGTH = 100
-PEOPLE_USERNAME_MAX_LENGTH = 20
-PEOPLE_NAME_MAX_LENGTH = 20
+USER_USERNAME_MAX_LENGTH = 20
+USER_NAME_MAX_LENGTH = 20
 RESPONSE_ANSWER_MAX_LENGTH = 500
 RESPONSE_ANSWER_MAX_NUMBER = 10
 MULTICHOICES_RESPONSE_MAX_LENGTH = 30
@@ -29,19 +30,17 @@ REGISTER_STATE_CHOICES = (
 )
 
 # Create your models here.
-class People(models.Model):
-    username = models.CharField(max_length = PEOPLE_USERNAME_MAX_LENGTH, unique = True)
-    name = models.CharField(max_length = PEOPLE_NAME_MAX_LENGTH)
-    email = models.EmailField(null = True, unique = True)
-    def __str__(self):
-        return self.username
-#    password = 
-#    hashString
+# class User(models.Model):
+#     username = models.CharField(max_length = USER_USERNAME_MAX_LENGTH, unique = True)
+#     name = models.CharField(max_length = USER_NAME_MAX_LENGTH)
+#     email = models.EmailField(null = True, unique = True)
+#     def __str__(self):
+#         return self.username
 
 class Event(models.Model):
     event_name = models.CharField(max_length = EVENT_NAME_MAX_LENGTH)
     creator = models.ForeignKey(
-        People,
+        User,
         null = True,
 #        limit_choices_to = RegisterEvent(identity = '0'),
         on_delete=models.SET_NULL#Set the reference to NULL (requires the field to be nullable). For instance, when you delete a User, you might want to keep the comments he posted on blog posts, but say it was posted by an anonymous (or deleted) user.
@@ -53,21 +52,22 @@ class Event(models.Model):
         return self.event_name
     
 class RegisterEvent(models.Model):
-    event = models.ForeignKey(#same event can not be registered twice by the same people!!!
+    event = models.ForeignKey(#same event can not be registered twice by the same user!!!
         Event,
         on_delete=models.CASCADE
         )
-    people = models.ForeignKey(
-        People,
-        on_delete=models.CASCADE
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        null = True
         )
     class Meta:
-        unique_together = (("event", "people"),)
+        unique_together = (("event", "user"),)
     register_time = models.DateTimeField('time registered', auto_now_add = True, null = True)
     identity = models.CharField(max_length = 1, choices = IDENTITY_CHOICES, null = True)
     register_state = models.CharField(max_length = 1, choices = REGISTER_STATE_CHOICES)
     def __str__(self):
-        return '%s registers %s as %s' % (self.people.username, self.event.event_name, self.identity.__str__())
+        return '%s registers %s as %s' % (self.user.username, self.event.event_name, self.identity.__str__())
 
 class Question(models.Model):
     event = models.ForeignKey(
@@ -114,7 +114,7 @@ class MultiChoicesResponse(models.Model):
     answer = models.CharField(max_length = MULTICHOICES_RESPONSE_MAX_LENGTH)
     last_updated_time = models.DateTimeField('last updated time')
     def __str__(self):
-        return '%s reponsed to %s' % (self.register_event.people, self.question.question_text)
+        return '%s reponsed to %s' % (self.register_event.user, self.question.question_text)
     
 class TextResponse(models.Model):
     question = models.ForeignKey(
@@ -132,7 +132,7 @@ class TextResponse(models.Model):
     answer = models.TextField(max_length = TEXT_RESPONSE_MAX_LENGTH)
     last_updated_time = models.DateTimeField('last updated time')
     def __str__(self):
-        return '%s reponsed to %s' % (self.register_event.people, self.question.question_text)
+        return '%s reponsed to %s' % (self.register_event.user, self.question.question_text)
 
 class EventAccess(models.Model):
     registerEvent = models.ForeignKey(
@@ -142,7 +142,7 @@ class EventAccess(models.Model):
     guestNumberIsVisible = models.BooleanField()
     guestListIsVisible = models.BooleanField()
     def __str__(self):
-        return '%s access of %s' % (self.registerEvent.people.username, self.registerEvent.event.event_name)
+        return '%s access of %s' % (self.registerEvent.user.username, self.registerEvent.event.event_name)
 
 class QuestionAccess(models.Model):
     registerEvent = models.ForeignKey(
@@ -155,4 +155,4 @@ class QuestionAccess(models.Model):
         )
     access = models.BooleanField()
     def __str__(self):
-        return '%s question access of %s' % (self.registerEvent.people.username, self.registerEvent.event.event_name)
+        return '%s question access of %s' % (self.registerEvent.user.username, self.registerEvent.event.event_name)

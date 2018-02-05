@@ -1,7 +1,9 @@
 from django.shortcuts import get_object_or_404, render,redirect
-from .models import Event,People,RegisterEvent,Question
+from .models import Event,RegisterEvent,Question
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
+from django.http import HttpResponseRedirect, HttpResponse
+from django.contrib.auth.models import User
 #testing
 def sign_in(request):
     Events = Event.objects.all()
@@ -16,20 +18,20 @@ def sign_in(request):
     # View code here...
 #    return render(request, 'RSVP/sign_in.html')
 
-def home(request,people_id):
-    people = get_object_or_404(People,pk = people_id)
-    own =  RegisterEvent.objects.filter(people=people,identity=0)
+def home(request):
+    user = get_object_or_404(User,username = request.user.username)
+    own =  RegisterEvent.objects.filter(user=user,identity=0)
     ownEventsPending = own.filter(register_state = 0)
     ownEvents = own.filter(register_state = 1)
     # ownHistory = ownEvents.filter(event.event_time < timezone.now)
-    guest = RegisterEvent.objects.filter(people=people,identity = 2)
+    guest = RegisterEvent.objects.filter(user=user,identity = 2)
     guestPending = guest.filter(register_state = 0)
     guestEvents = guest.filter(register_state = 1)
-    vendor = RegisterEvent.objects.filter(people=people,identity = 1)
+    vendor = RegisterEvent.objects.filter(user=user,identity = 1)
     vendorPending = vendor.filter(register_state = 0)
     vendorEvents = vendor.filter(register_state = 1)
     return render(request,'RSVP/home.html',{
-        'username' : people.username,
+        'username' : user.username,
         'ownEventsPending': ownEventsPending,
         'ownEvents':ownEvents,
         'guestPending':guestPending,
@@ -100,10 +102,18 @@ def signup(request):
             form.save()
             username = form.cleaned_data.get('username')
             raw_password = form.cleaned_data.get('password')
+#            User.objects.create_user(username, username + "@gmail.com", raw_password)
             user = authenticate(username=username, password=raw_password)
-            login(request, user)
-            #return redirect('')
-            return render(request, 'RSVP/signup.html', {'form': form})
+            if user is not None:
+                login(request, user)
+                return redirect('test')
+            else:
+                return HttpResponse("failed to authenticate")                
+#            return render(request,'RSVP/test.html')
+#            return render(request, 'RSVP/signup.html', {'form': form})
     else:
         form = UserCreationForm()
     return render(request, 'RSVP/signup.html', {'form': form})
+
+def test(request):
+    return HttpResponse("Hello, world. You're " + request.user.username)
