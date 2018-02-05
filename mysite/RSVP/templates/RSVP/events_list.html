@@ -42,12 +42,12 @@
   <div class="container">
     <div class="row">
       <form action="/admin" method="post">
-      <div class="col-md-4 mb-3">
+	<div class="col-md-12 mb-3">
         <input id="event_name" type="text" class="form-control" placeholder="{{event_name}}" value="" required="">
-      </div>
-      <div class="col-md-4 mb-3">
-        <input id="event_time" type="datetime-local" class="form-control" placeholder="{{event_time}}" value="" required="">
-      </div>
+	</div>
+	<div class="col-md-12 mb-3">
+          <input id="event_time" type="datetime-local" class="form-control" placeholder="{{event_time}}" value="" required="">
+	</div>
       <div class="col-md-4 mb-3">
 	<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Save change</button>
       </div>
@@ -69,7 +69,7 @@
   		</button>
   	 	<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
 		 {% for people in guestPass %}
-    		 <a class="dropdown-item" href="#">{{people.people}}</a>
+    		 <a class="dropdown-item" href="#">{{people.user}}</a>
 		 {% endfor %}
   </div>
 
@@ -82,7 +82,7 @@
   </button>
   <div class="dropdown-menu">
     {% for people in guestPending %}
-         <a class="dropdown-item" href="#">{{people.people}}</a>
+         <a class="dropdown-item" href="#">{{people.user}}</a>
     {% endfor %}
   </div>
 </div>
@@ -107,7 +107,7 @@
       </button>
       <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
      {% for people in vendorPass %}
-         <a class="dropdown-item" href="#">{{people.people}}</a>
+         <a class="dropdown-item" href="#">{{people.user}}</a>
      {% endfor %}
   </div>
 
@@ -120,7 +120,7 @@
   </button>
   <div class="dropdown-menu">
     {% for people in vendorPending %}
-         <a class="dropdown-item" href="#">{{people.people}}</a>
+         <a class="dropdown-item" href="#">{{people.user}}</a>
     {% endfor %}
   </div>
 </div>
@@ -140,13 +140,14 @@
       </h3>
 <div class="bd-example">
 
+ 
   <div class="dropdown">
       <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       Owner list
       </button>
       <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
      {% for people in ownerPass %}
-         <a class="dropdown-item" href="#">{{people.people}}</a>
+         <a class="dropdown-item" href="#">{{people.user}}</a>
      {% endfor %}
   </div>
 
@@ -159,7 +160,7 @@
   </button>
   <div class="dropdown-menu">
     {% for people in ownerPending %}
-         <a class="dropdown-item" href="#">{{people.people}}</a>
+         <a class="dropdown-item" href="#">{{people.user}}</a>
     {% endfor %}
   </div>
 </div>
