@@ -102,9 +102,8 @@ def signup(request):
             raw_password = form.cleaned_data.get('password')
             user = authenticate(username=username, password=raw_password)
             login(request, user)
-            return redirect('home')
+            #return redirect('')
+            return render(request, 'RSVP/signup.html', {'form': form})
     else:
         form = UserCreationForm()
     return render(request, 'RSVP/signup.html', {'form': form})
-def home(request):
-    return render(request, "index.html")
