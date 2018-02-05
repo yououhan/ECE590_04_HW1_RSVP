@@ -1,6 +1,7 @@
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render,redirect
 from .models import Event,People,RegisterEvent,Question
-
+from django.contrib.auth import login, authenticate
+from django.contrib.auth.forms import UserCreationForm
 #testing
 def sign_in(request):
     Events = Event.objects.all()
@@ -92,3 +93,18 @@ def sign_up(request):
     template = "RSVP/sign_up.html"
     context = { "form" : NameForm() }
     return render( request, template, context )
+def signup(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=raw_password)
+            login(request, user)
+            return redirect('home')
+    else:
+        form = UserCreationForm()
+    return render(request, 'RSVP/signup.html', {'form': form})
+def home(request):
+    return render(request, "index.html")
