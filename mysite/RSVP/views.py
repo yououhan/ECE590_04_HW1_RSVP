@@ -7,7 +7,26 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from django.contrib.auth import logout
 from .forms import EventForm
+from .forms import QuestionForm
 
+def questionPage(request):
+    if request.method == 'POST':
+        form = QuestionForm(request.POST)
+        if form.is_valid():
+            question_text = form.cleaned_data['question_text']
+            question_type = form.cleaned_data['question_type']
+            question = Question(#event =,
+                                question_text=question_text,
+                                question_type=question_type
+            )
+            question.save()
+            return HttpResponse("success")
+    else:
+        form = QuestionForm()
+    return render(request,'RSVP/questionPage.html',{
+        'form':form
+    })
+        
 def event_create(request):
     if request.method == 'POST':
         form = EventForm(request.POST)
@@ -97,8 +116,9 @@ def events_list(request, event_id):
     else:
         form = EventForm()
 #    return render(request, 'events_list.html', {'form': form})
-    event = get_object_or_404(Event, pk = event_id)
 
+    username = request.user.username
+    event = get_object_or_404(Event, pk = event_id)
     questions = Question.objects.filter(event=event)
 
     guest = RegisterEvent.objects.filter(event=event,identity=2)
@@ -131,7 +151,7 @@ def events_list(request, event_id):
         'questions':questions,
         'timeNow':timezone.now(),
         'form' : form,
-  #      'user':user
+        'username':username
     })
 #pass the event ID here and can use the get object funciton
 

@@ -28,11 +28,11 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
           <li class="nav-item active">
-            <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+            <a class="nav-link" href="/RSVP/home">Home <span class="sr-only">(current)</span></a>
           </li>
         </ul>
         <form class="form-inline my-2 my-lg-0">
-          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">UserName</button>
+          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">{{username}}</button>
           <button class="btn btn-outline-success my-2 my-sm-0" type="submit">SignOut</button>
         </form> 
       </div>
@@ -41,17 +41,17 @@
 <!--the event name and time!!!!!!!!!!!!!!!!!!!!!!!-->
   <div class="container">
     <div class="row">
-      <form action="/admin" method="post">
+<!--      <form action="/admin" method="post">-->
 	<div class="col-md-12 mb-3">
-        <input id="event_name" type="text" class="form-control" placeholder="{{event_name}}" value="" required="">
+	  <h3>{{event_name}} </h3>
 	</div>
 	<div class="col-md-12 mb-3">
-          <input id="event_time" type="datetime-local" class="form-control" placeholder="{{event_time}}" value="" required="">
+	  <h3>{{event_time}}</h3>
 	</div>
       <div class="col-md-4 mb-3">
-	<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Save change</button>
+	<button type="button" class="btn btn-danger">delete this event</button>
       </div>
-    </form>
+<!--    </form> -->
     </div>
 <hr>
 
