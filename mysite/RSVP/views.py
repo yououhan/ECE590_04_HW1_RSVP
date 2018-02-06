@@ -29,9 +29,11 @@ def questionPage(request,event_id):
     else:
         QuestionForm = Questionform()
         ChoiceForm = Choiceform()
+        
     return render(request,'RSVP/questionPage.html',{
         'Questionform':Questionform(),
         'ChoiceForm':Choiceform()
+        
     })
         
 def event_create(request):
