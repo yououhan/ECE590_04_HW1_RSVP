@@ -1,31 +1,37 @@
 from django.shortcuts import get_object_or_404, render,redirect
-from .models import Event,RegisterEvent,Question
+from .models import Event,RegisterEvent,Question, Choice
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.contrib.auth import logout
-from .forms import EventForm
-from .forms import QuestionForm
+from .forms import EventForm, Questionform, Choiceform
 
 def questionPage(request,event_id):
     if request.method == 'POST':
-        Questionform = QuestionForm(request.POST)
-        if Questionform.is_valid():
-            question_text = Questionform.cleaned_data['question_text']
-            question_type = Questionform.cleaned_data['question_type']
+        ChoiceForm = Choiceform(request.POST)    
+        QuestionForm = Questionform(request.POST)
+        if QuestionForm.is_valid() and ChoiceForm.is_valid():
+            question_text = QuestionForm.cleaned_data['question_text']
+            question_type = QuestionForm.cleaned_data['question_type']
             question = Question(
                 event= get_object_or_404(Event,pk = event_id),
                 question_text=question_text,
                 question_type=question_type
             )
             question.save()
+            choice_text = ChoiceForm.cleaned_data['choice_text']
+            choice = Choice(question_id=question.id,
+                            choice_text=choice_text)
+            choice.save()
             return HttpResponse("success")
     else:
-        Questionform = QuestionForm()
+        QuestionForm = Questionform()
+        ChoiceForm = Choiceform()
     return render(request,'RSVP/questionPage.html',{
-        'Questionform':Questionform
+        'Questionform':Questionform(),
+        'ChoiceForm':Choiceform()
     })
         
 def event_create(request):
