@@ -8,6 +8,23 @@ from django.utils import timezone
 from django.contrib.auth import logout
 from .forms import EventForm
 
+def event_create(request):
+    if request.method == 'POST':
+        form = EventForm(request.POST)
+        if form.is_valid():
+            event_name = form.cleaned_data('event_name')
+            event_time = form. cleaned_data('event_time')
+            creator = request.user
+            return HttpResponse("Hello, world")
+        else:
+            return HttpResponse("Error")
+    else:
+        form = EventForm()
+    return render(request,'RSVP/event_create.html',{
+        'form':form
+    })
+        
+
 #testing
 def sign_in(request):
     Events = Event.objects.all()
