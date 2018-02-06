@@ -1,5 +1,5 @@
 from django import forms
-#from django import 
+import datetime
 
 class EventForm(forms.Form):
     event_name = forms.CharField(label='Event name', max_length=100)

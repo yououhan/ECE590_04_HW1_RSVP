@@ -12,9 +12,20 @@ def event_create(request):
     if request.method == 'POST':
         form = EventForm(request.POST)
         if form.is_valid():
-            event_name = form.cleaned_data('event_name')
-            event_time = form. cleaned_data('event_time')
+            event_name = form.cleaned_data['event_name']
+            event_time = form.cleaned_data['event_time']
             creator = request.user
+            event = Event(event_name=event_name,
+                          event_time=event_time,
+                          creator = creator
+            )
+            event.save()
+            register=RegisterEvent(event=event,
+                                   user=request.user,
+                                   identity = '0',
+                                   register_state ='1' 
+            )
+            register.save()
             return HttpResponse("Hello, world")
         else:
             return HttpResponse("Error")
