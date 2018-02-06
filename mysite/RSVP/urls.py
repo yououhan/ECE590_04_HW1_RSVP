@@ -9,6 +9,7 @@ urlpatterns = [
     path('sign_in', views.sign_in, name='sign_in'),
     path('home/', views.home, name='home'),
     path('event/<int:event_id>', views.events_list, name='events_list'),
+    path('event_create/', views.event_create, name='event create'),    
     path('index', views.index, name = 'index'),
     path('sign_up', views.sign_up, name = 'sign_up'),
     path('accounts/login/', auth_views.LoginView.as_view(template_name='RSVP/login.html')),
