@@ -6,7 +6,7 @@ from django.contrib.auth import views as auth_views
 from . import views
 
 urlpatterns = [
-    path('questionPage',views.questionPage,name='questionPage'),
+    path('event/<int:event_id>/questionPage',views.questionPage,name='questionPage'),
     path('sign_in', views.sign_in, name='sign_in'),
     path('home/', views.home, name='home'),
     path('event/<int:event_id>', views.events_list, name='events_list'),

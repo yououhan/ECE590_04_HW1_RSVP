@@ -1,15 +1,16 @@
 from django import forms
 import datetime
+from django.forms import ModelForm
+from .models import Event, Question
+from django.forms import MultiWidget
+from django.forms.widgets import SelectDateWidget
+class EventForm(ModelForm):
+    class Meta:
+        model = Event
+        fields = ['event_name', 'event_time']
+#        widgets = {'event_time' : forms.SelectDateWidget()}
 
-class EventForm(forms.Form):
-    event_name = forms.CharField(label='Event name', max_length=100)
-    event_time = forms.DateTimeField()
-
-
-class QuestionForm(forms.Form):
-    question_text = forms.CharField(label='Question',max_length=200)
-    question_type = forms.CharField(label='type', max_length = 1)
-#    isEditable = forms.BooleanField(label='editable')
-#    isOptional = forms.BooleanField(label='optional')
-    
-    
+class QuestionForm(ModelForm):
+    class Meta:
+        model = Question
+        fields = ['question_text', 'question_type', 'isEditable', 'isOptional']    

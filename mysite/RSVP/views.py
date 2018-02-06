@@ -9,22 +9,23 @@ from django.contrib.auth import logout
 from .forms import EventForm
 from .forms import QuestionForm
 
-def questionPage(request):
+def questionPage(request,event_id):
     if request.method == 'POST':
-        form = QuestionForm(request.POST)
-        if form.is_valid():
-            question_text = form.cleaned_data['question_text']
-            question_type = form.cleaned_data['question_type']
-            question = Question(#event =,
-                                question_text=question_text,
-                                question_type=question_type
+        Questionform = QuestionForm(request.POST)
+        if Questionform.is_valid():
+            question_text = Questionform.cleaned_data['question_text']
+            question_type = Questionform.cleaned_data['question_type']
+            question = Question(
+                event= get_object_or_404(Event,pk = event_id),
+                question_text=question_text,
+                question_type=question_type
             )
             question.save()
             return HttpResponse("success")
     else:
-        form = QuestionForm()
+        Questionform = QuestionForm()
     return render(request,'RSVP/questionPage.html',{
-        'form':form
+        'Questionform':Questionform
     })
         
 def event_create(request):
@@ -50,6 +51,7 @@ def event_create(request):
             return HttpResponse("Error")
     else:
         form = EventForm()
+    #form.fields['event_name'].widget.attrs['readonly'] = True # disable a form!
     return render(request,'RSVP/event_create.html',{
         'form':form
     })
@@ -137,8 +139,7 @@ def events_list(request, event_id):
     vendorNum = vendorPass.count()
 
     return render(request, 'RSVP/events_list.html', {
-        'event_name': event.event_name,
-        'event_time': event.event_time,
+        'event': event,
         'guestPending':guestPending,
         'guestPass':guestPass,
         'guestNum':guestNum,
