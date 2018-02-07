@@ -49,5 +49,4 @@ class inviteNewUserform(forms.Form):
                 
 class newChoiceform(forms.Form):
     choice_text = forms.CharField(label='new choice',max_length=100)
-
     

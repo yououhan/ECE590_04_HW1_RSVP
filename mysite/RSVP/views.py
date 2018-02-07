@@ -8,6 +8,23 @@ from django.contrib.auth import logout
 from .forms import EventForm, Questionform, Choiceform
 from django.forms import formset_factory
 from .forms import UserCreationForm, inviteNewUserform,newChoiceform
+from django import forms
+def makeMultiChoiceAnswerform(question):
+    choicesQueryset = Choice.objects.filter(question=question.id)
+    class multiChoiceAnswerform(forms.Form):
+        choices = forms.ModelChoiceField(queryset=choicesQueryset)
+    return multiChoiceAnswerform
+
+def questionAnswer(request, event_id):
+    multiChoiceQuestions = Question.objects.filter(event=event_id, question_type='S')
+    question = multiChoiceQuestions.first()
+    #formset_factory()
+    #for question in multiChoiceQuestions:
+    multiChoiceAnswerForm = makeMultiChoiceAnswerform(question)
+    return render(request, 'RSVP/questionAnswer.html',{
+         'multiChoiceAnswerform':multiChoiceAnswerForm,
+ #       'multiChoiceAnswerformset':multiChoiceAnswerFormset,
+        })
 
 def questionPageCreate(request,event_id):
     if request.method == 'POST':
