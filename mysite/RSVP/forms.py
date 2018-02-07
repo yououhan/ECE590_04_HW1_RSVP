@@ -44,6 +44,14 @@ class UserCreationForm(UserCreationForm):
     #         user.save()
     #     return user
 
-class inviteNewform(forms.Form):
-    new_userName = forms.CharField(label='New userName', max_length=100)
+class inviteNewGuestform(forms.Form):
+    newGuest_userName = forms.CharField(label='New Guest userName', max_length=100)
         
+class inviteNewOwnerform(forms.Form):
+    newOwner_userName = forms.CharField(label='New Owner userName', max_length=100)
+        
+class inviteNewVendorform(forms.Form):
+    newVendor_userName = forms.CharField(label='New Vendor userName', max_length=100)
+        
+
+    

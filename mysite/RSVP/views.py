@@ -5,9 +5,9 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.contrib.auth import logout
-from .forms import EventForm, Questionform, Choiceform,inviteNewform
+from .forms import EventForm, Questionform, Choiceform
 from django.forms import formset_factory
-from .forms import UserCreationForm
+from .forms import UserCreationForm,inviteNewGuestform,inviteNewOwnerform,inviteNewVendorform
 
 def questionPageCreate(request,event_id):
     ChoiceFormSet = formset_factory(Choiceform, extra = 3)
@@ -27,6 +27,9 @@ def questionPageCreate(request,event_id):
                 isOptional=isOptional,
             )
             question.save()
+
+
+            
             for ChoiceForm in formset:
                 choice_text = ChoiceForm.cleaned_data['choice_text']
                 choice = Choice(question_id=question.id,
@@ -141,9 +144,11 @@ def home(request):
 
 def events_list(request, event_id):
     if request.method == 'POST':
-        inviteNewForm = inviteNewform(request.POST)
-        if inviteNewForm.is_valid():
-            new_userName = inviteNewForm.cleaned_data.get('new_userName')
+        inviteNewGuestForm = inviteNewGuestform(request.POST)
+        inviteNewOwnerForm = inviteNewOwnerform(request.POST)
+        inviteNewVendorForm = inviteNewVendorform(request.POST)
+        if inviteNewGuestForm.is_valid():
+            new_userName = inviteNewGuestForm.cleaned_data.get('newGuest_userName')
             new_user=User.objects.get(username=new_userName)
             newInvite=RegisterEvent(
                 event=get_object_or_404(Event,pk=event_id),
@@ -152,6 +157,30 @@ def events_list(request, event_id):
                 register_state='0'
             )
             newInvite.save()
+
+        if inviteNewOwnerForm.is_valid():
+            new_userName = inviteNewOwnerForm.cleaned_data.get('newOwner_userName')
+            new_user=User.objects.get(username=new_userName)
+            newInvite=RegisterEvent(
+                event=get_object_or_404(Event,pk=event_id),
+                user = new_user,
+                identity= '0',
+                register_state='0'
+            )
+            newInvite.save()
+
+        if inviteNewVendorForm.is_valid():
+            new_userName = inviteNewVendorForm.cleaned_data.get('newVendor_userName')
+            new_user=User.objects.get(username=new_userName)
+            newInvite=RegisterEvent(
+                event=get_object_or_404(Event,pk=event_id),
+                user = new_user,
+                identity= '1',
+                register_state='0'
+            )
+            newInvite.save()
+
+            
     username = request.user.username
     event = get_object_or_404(Event, pk = event_id)
     questions = Question.objects.filter(event=event)
@@ -170,7 +199,10 @@ def events_list(request, event_id):
     vendorPending = vendor.filter(register_state=0)
     vendorPass = vendor.filter(register_state=1)
     vendorNum = vendorPass.count()
-    inviteNewForm = inviteNewform()
+    inviteNewGuestForm = inviteNewGuestform()
+    inviteNewOwnerForm = inviteNewOwnerform()
+    inviteNewVendorForm = inviteNewVendorform()
+    
     return render(request, 'RSVP/events_list.html', {
         'event': event,
         'guestPending':guestPending,
@@ -184,9 +216,10 @@ def events_list(request, event_id):
         'vendorNum':vendorNum,
         'questions':questions,
         'timeNow':timezone.now(),
-#        'form' : form,
         'username':username,
-        'inviteNewform':inviteNewForm,
+        'inviteNewGuestform':inviteNewGuestForm,
+        'inviteNewOwnerform':inviteNewOwnerForm,
+        'inviteNewVendorform':inviteNewVendorForm,
     })
 #pass the event ID here and can use the get object funciton
 

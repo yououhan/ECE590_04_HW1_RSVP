@@ -92,7 +92,7 @@
 		{{error}}
 	      </div>
 	      {% endfor %}
-	      {% for field in inviteNewform %}
+	      {% for field in inviteNewGuestform %}
 	      <div class="form-group has-errors text-danger small">
 		{{field.errors}}
 	      </div>
@@ -131,9 +131,6 @@
 		{% endfor %}
 	      </div>
 
-	      <button type="button" class="btn btn-primary" data-toggle="button" aria-pressed="false" autocomplete="off">
-		invite new 
-	      </button>
 	      <div class="btn-group">
 		<button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 		  Pending vendor
@@ -146,6 +143,33 @@
 	      </div>
 
 
+
+	    <div style="width:30%">
+	      <form action="" method="post">
+		{%csrf_token%}
+		{% for error in form.non_field_errors %}
+	      <div class="form-group has-errors text-danger small">
+		{{error}}
+	      </div>
+	      {% endfor %}
+	      {% for field in inviteNewVendorform %}
+	      <div class="form-group has-errors text-danger small">
+		{{field.errors}}
+	      </div>
+	      <div class="form-group has-errors text-danger small">
+	      </div>
+	      <div class="form-group">
+		{{field.label}}
+		{{field}}
+	      </div>
+	      {% endfor %}
+	      <button class="btn btn-primary" style="width:100%">invite new vendor</button>
+	      </form>
+	    </div>
+	    
+
+
+	      
 
 	    </div>
 	  </div>
@@ -184,6 +208,30 @@
 		    {% endfor %}
 		  </div>
 		</div>
+
+	    <div style="width:30%">
+	      <form action="" method="post">
+		{%csrf_token%}
+		{% for error in form.non_field_errors %}
+	      <div class="form-group has-errors text-danger small">
+		{{error}}
+	      </div>
+	      {% endfor %}
+	      {% for field in inviteNewOwnerform %}
+	      <div class="form-group has-errors text-danger small">
+		{{field.errors}}
+	      </div>
+	      <div class="form-group has-errors text-danger small">
+	      </div>
+	      <div class="form-group">
+		{{field.label}}
+		{{field}}
+	      </div>
+	      {% endfor %}
+	      <button class="btn btn-primary" style="width:100%">invite new Owner</button>
+	      </form>
+	    </div>
+	    
 
 
 
