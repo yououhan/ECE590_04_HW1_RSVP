@@ -66,6 +66,20 @@
 	  <button class="btn btn-primary" style="width:100%">Add Question</button>
       </div>
       </form>
+      <div>
+	<h2>{{question.question_text}}</h2>
+	<h2>{{question.question_type}}</h2>
+	{% for c in choice%}
+	<h2>{{c.choice_text}}</h2>
+	<h2>{{c.id}}</h2>
+
+	{% endfor%}
+
+	
+      </div>
+
+
+      
     </div>
 
 <!-- <form action="#" method="post"> -->

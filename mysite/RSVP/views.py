@@ -45,6 +45,8 @@ def questionPageCreate(request,event_id):
     })
 
 def questionPageEdit(request, event_id, question_id):
+    question = get_object_or_404(Question,pk=question_id)
+    choice = Choice.objects.filter(question=question)
     ChoiceFormSet = formset_factory(Choiceform, extra = 3)
     if request.method == 'POST':
         QuestionForm = Questionform(request.POST)
@@ -62,16 +64,18 @@ def questionPageEdit(request, event_id, question_id):
             question.save()
 #            for ChoiceForm in formset:
 #                choice_text = ChoiceForm.cleaned_data['choice_text']
-#                choice = Choice(question_id=question.id,
-#                                choice_text=choice_text)
-#                choice.save()
-            return HttpResponse("success")
+ #               choice = Choice(question_id=question_id,
+ #                               choice_text=choice_text)
+ #               choice.save()
+#            return HttpResponse("success")
     else:
         QuestionForm = Questionform()
         formset = ChoiceFormSet()
     return render(request,'RSVP/questionPage.html',{
         'Questionform': QuestionForm,
-        'formset': formset,        
+        'formset': formset,
+        'question':question,
+        'choice':choice,
     })
     
 def event_create(request):
