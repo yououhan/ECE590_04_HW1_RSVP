@@ -48,13 +48,12 @@
 	<div class="col-md-12 mb-3">
 	  <h3>{{event.event_time}}</h3>
 	</div>
-	<form method="post" action="../">
+	<form method="post" action="">
 	  {%csrf_token%}
 	  <div class="col-md-4 mb-3">
-	    <button type="button" class="btn btn-danger" name="delete_event" value="delete_event" type="submit">delete this event</button>
+	    <button type="submit" class="btn btn-danger" name="delete_event" value="{{event.id}}" type="submit">delete this event</button>
 	  </div>
 	</form>
-	<!--    </form> -->
       </div>
       <hr>
 
@@ -231,10 +230,6 @@
 	      </div>
 	    </div>
 	    <hr>
-
-
-
-
 
 	    <div>
 	      <h2>Question</h2>
