@@ -60,11 +60,14 @@
         <p>you can accpet or decline those events </p>
 
         {% for event in ownEventsPending %}
-        <p>{{event.event}}
-          <a class="btn btn-secondary" href="#" role="button">accept
-          </a>
-          <a class="btn btn-secondary" href="#" role="button">decline </a>
-        </p>
+        <p>
+	  <form method="post" action="">
+	    {{event.event}}
+	    {%csrf_token%}
+	    <button type="submit" class="btn btn-primary" name="accept" value="{{event.id}}" type="submit">accept</button>
+	    <button type="submit" class="btn btn-danger" name="decline" value="{{event.id}}" type="submit">decline</button>
+	  </form>
+	</p>
         {% endfor %}
       </div>
           
@@ -74,11 +77,14 @@
         <p>you can accpet or decline those events</p>
 
         {% for event in guestPending %}
-        <p>{{event.event}}
-          <a class="btn btn-secondary" href="#" role="button">accept
-          </a>
-          <a class="btn btn-secondary" href="#" role="button">decline </a>
-        </p>
+        <p>
+	  <form method="post" action="">
+	    {{event.event}}
+	    {%csrf_token%}
+	    <button type="submit" class="btn btn-primary" name="accept" value="{{event.id}}" type="submit">accept</button>
+	    <button type="submit" class="btn btn-danger" name="decline" value="{{event.id}}" type="submit">decline</button>
+	  </form>
+	</p>
         {% endfor %}
       </div>
 
@@ -87,13 +93,17 @@
         <h5>You've been invited to vendor those event</h5>
         <p>you can accpet or decline those events</p>
 
-        {% for event in venderPending %}
-        <p>{{event.event}}
-          <a class="btn btn-secondary" href="#" role="button">accept
-          </a>
-          <a class="btn btn-secondary" href="#" role="button">decline </a>
-        </p>
+        {% for event in vendorPending %}
+        <p>
+	  <form method="post" action="">
+	    {{event.event}}
+	    {%csrf_token%}
+	    <button type="submit" class="btn btn-primary" name="accept" value="{{event.id}}" type="submit">accept</button>
+	    <button type="submit" class="btn btn-danger" name="decline" value="{{event.id}}" type="submit">decline</button>
+	  </form>
+	</p>
         {% endfor %}
+	
       </div>
     </div> 
     <hr>

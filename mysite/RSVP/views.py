@@ -80,6 +80,10 @@ def questionPageEdit(request, event_id, question_id):
         elif request.POST.get('delete'):
             toBeDeleted = Choice.objects.filter(pk=request.POST.get('delete'))
             toBeDeleted.delete()
+        elif request.POST.get('deleteQ'):
+            toDeleteQuestion = Question.objects.get(pk=question_id)
+            toDeleteQuestion.delete()
+            return redirect('../')
             
     newChoiceForm = newChoiceform()
     QuestionForm = Questionform(instance = question)
@@ -147,6 +151,15 @@ def home(request):
     vendor = RegisterEvent.objects.filter(user=user,identity = 1)
     vendorPending = vendor.filter(register_state = 0)
     vendorEvents = vendor.filter(register_state = 1)
+    if request.method == 'POST':
+        if request.POST.get('accept'):
+            acceptRegister=RegisterEvent.objects.get(pk=request.POST.get('accept'))
+            acceptRegister.register_state='1'
+            acceptRegister.save()
+        elif request.POST.get('decline'):
+            declineRegister=RegisterEvent.objects.get(pk=request.POST.get('decline'))
+            declineRegister.register_state='2'
+            declineRegister.save()
     return render(request,'RSVP/home.html',{
         'username' : user.username,
         'ownEventsPending': ownEventsPending,
@@ -165,6 +178,7 @@ def events_list(request, event_id):
         if request.POST.get('delete_event'):
             event = get_object_or_404(Event, pk=event_id)
             event.delete()
+            return redirect('../../home/')
         elif request.POST.get('invite'):
             inviteNewUserForm = inviteNewUserform(request.POST)
             if inviteNewUserForm.is_valid():
@@ -177,7 +191,8 @@ def events_list(request, event_id):
                     register_state='0'
                 )
                 newInvite.save()
-            
+      
+                
     username = request.user.username
     event = get_object_or_404(Event, pk = event_id)
     questions = Question.objects.filter(event=event)
