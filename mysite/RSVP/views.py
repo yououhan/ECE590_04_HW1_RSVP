@@ -65,7 +65,7 @@ def questionPageEdit(request, event_id, question_id):
             toBeDeleted.delete()
             
     newChoiceForm = newChoiceform()
-    QuestionForm = Questionform()
+    QuestionForm = Questionform(instance = question)
     return render(request,'RSVP/questionPage.html',{
         'newChoiceform':newChoiceForm,
         'Questionform': QuestionForm,
