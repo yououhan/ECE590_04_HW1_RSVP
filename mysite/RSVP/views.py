@@ -1,41 +1,76 @@
 from django.shortcuts import get_object_or_404, render,redirect
 from .models import Event,RegisterEvent,Question, Choice
 from django.contrib.auth import login, authenticate
-from django.contrib.auth.forms import UserCreationForm
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.contrib.auth import logout
-from .forms import EventForm, Questionform, Choiceform
+from .forms import EventForm, Questionform, Choiceform,inviteNewform
+from django.forms import formset_factory
+from .forms import UserCreationForm
 
-def questionPage(request,event_id):
+def questionPageCreate(request,event_id):
+    ChoiceFormSet = formset_factory(Choiceform, extra = 3)
     if request.method == 'POST':
-        ChoiceForm = Choiceform(request.POST)    
         QuestionForm = Questionform(request.POST)
-        if QuestionForm.is_valid() and ChoiceForm.is_valid():
+        formset = ChoiceFormSet(request.POST)
+        if QuestionForm.is_valid() and formset.is_valid():
             question_text = QuestionForm.cleaned_data['question_text']
             question_type = QuestionForm.cleaned_data['question_type']
+            isEditable =  QuestionForm.cleaned_data['isEditable']
+            isOptional =  QuestionForm.cleaned_data['isOptional']
             question = Question(
                 event= get_object_or_404(Event,pk = event_id),
                 question_text=question_text,
-                question_type=question_type
+                question_type=question_type,
+                isEditable=isEditable,
+                isOptional=isOptional,
             )
             question.save()
-            choice_text = ChoiceForm.cleaned_data['choice_text']
-            choice = Choice(question_id=question.id,
-                            choice_text=choice_text)
-            choice.save()
+            for ChoiceForm in formset:
+                choice_text = ChoiceForm.cleaned_data['choice_text']
+                choice = Choice(question_id=question.id,
+                                choice_text=choice_text)
+                choice.save()
             return HttpResponse("success")
     else:
         QuestionForm = Questionform()
-        ChoiceForm = Choiceform()
-        
+        formset = ChoiceFormSet()
     return render(request,'RSVP/questionPage.html',{
-        'Questionform':Questionform(),
-        'ChoiceForm':Choiceform()
-        
+        'Questionform': QuestionForm,
+        'formset': formset,        
     })
-        
+
+def questionPageEdit(request, event_id, question_id):
+    ChoiceFormSet = formset_factory(Choiceform, extra = 3)
+    if request.method == 'POST':
+        QuestionForm = Questionform(request.POST)
+        formset = ChoiceFormSet(request.POST)
+        if QuestionForm.is_valid() and formset.is_valid():
+            question_text = QuestionForm.cleaned_data['question_text']
+            question_type = QuestionForm.cleaned_data['question_type']
+            isEditable =  QuestionForm.cleaned_data['isEditable']
+            isOptional =  QuestionForm.cleaned_data['isOptional']
+            question = Question.objects.get(pk = question_id)
+            question.question_text = question_text
+            question.question_type = question_type
+            question.isEditable = isEditable
+            question.isOptional = isOptional
+            question.save()
+#            for ChoiceForm in formset:
+#                choice_text = ChoiceForm.cleaned_data['choice_text']
+#                choice = Choice(question_id=question.id,
+#                                choice_text=choice_text)
+#                choice.save()
+            return HttpResponse("success")
+    else:
+        QuestionForm = Questionform()
+        formset = ChoiceFormSet()
+    return render(request,'RSVP/questionPage.html',{
+        'Questionform': QuestionForm,
+        'formset': formset,        
+    })
+    
 def event_create(request):
     if request.method == 'POST':
         form = EventForm(request.POST)
@@ -105,28 +140,18 @@ def home(request):
 #n    return render(request, 'RSVP/home.html')
 
 def events_list(request, event_id):
-    # if this is a POST request we need to process the form data
     if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
-        form = EventForm(request.POST)
-        # check whether it's valid:
-        if form.is_valid():
-            event_name = form.cleaned_data.get('event_name')
-            event_time = form.cleaned_data.get('event_time')
-            event_id = request.event_id
-            obj, created = Event.objects.update_or_create(
-                event_id = event_id, defaults = {'event_name':event_name , 'event_time':event_time},
+        inviteNewForm = inviteNewform(request.POST)
+        if inviteNewForm.is_valid():
+            new_userName = inviteNewForm.cleaned_data.get('new_userName')
+            new_user=User.objects.get(username=new_userName)
+            newInvite=RegisterEvent(
+                event=get_object_or_404(Event,pk=event_id),
+                user = new_user,
+                identity= '2',
+                register_state='0'
             )
-            #return HttpResponse(event_name + event_time)
-            # process the data in form.cleaned_data as required
-            # ...
-            # redirect to a new URL:
-            return HttpResponseRedirect('/RSVP/event/' + event_id)
-        # if a GET (or any other method) we'll create a blank form
-    else:
-        form = EventForm()
-#    return render(request, 'events_list.html', {'form': form})
-
+            newInvite.save()
     username = request.user.username
     event = get_object_or_404(Event, pk = event_id)
     questions = Question.objects.filter(event=event)
@@ -145,7 +170,7 @@ def events_list(request, event_id):
     vendorPending = vendor.filter(register_state=0)
     vendorPass = vendor.filter(register_state=1)
     vendorNum = vendorPass.count()
-
+    inviteNewForm = inviteNewform()
     return render(request, 'RSVP/events_list.html', {
         'event': event,
         'guestPending':guestPending,
@@ -159,8 +184,9 @@ def events_list(request, event_id):
         'vendorNum':vendorNum,
         'questions':questions,
         'timeNow':timezone.now(),
-        'form' : form,
-        'username':username
+#        'form' : form,
+        'username':username,
+        'inviteNewform':inviteNewForm,
     })
 #pass the event ID here and can use the get object funciton
 

@@ -59,7 +59,10 @@
 	    {{field}}
 	  </div>
 	  {% endfor %}
-	  {{ChoiceForm}}
+	  {{ formset.management_form }}
+          {% for form in formset %}
+	  {{ form }}
+	  {% endfor %}
 	  <button class="btn btn-primary" style="width:100%">Add Question</button>
       </div>
       </form>
