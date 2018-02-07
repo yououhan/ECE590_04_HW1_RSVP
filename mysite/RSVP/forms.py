@@ -53,5 +53,7 @@ class inviteNewOwnerform(forms.Form):
 class inviteNewVendorform(forms.Form):
     newVendor_userName = forms.CharField(label='New Vendor userName', max_length=100)
         
+class newChoiceform(forms.Form):
+    choice_text = forms.CharField(label='new choice',max_length=100)
 
     

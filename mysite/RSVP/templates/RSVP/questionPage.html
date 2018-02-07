@@ -29,7 +29,7 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
           <li class="nav-item active">
-            <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+            <a class="nav-link" href="/RSVP/home">Home <span class="sr-only">(current)</span></a>
           </li>
         </ul>
         <form class="form-inline my-2 my-lg-0">
@@ -39,7 +39,8 @@
       </div>
     </nav>
     <div class="container">
-      <h1>Example Form</h1>
+
+      <h1>{{question.question_text}}</h1>
       <div style="width:30%">
 	<form action="" method="post">
 	  {%csrf_token%}
@@ -59,21 +60,51 @@
 	    {{field}}
 	  </div>
 	  {% endfor %}
-	  {{ formset.management_form }}
-          {% for form in formset %}
-	  {{ form }}
-	  {% endfor %}
-	  <button class="btn btn-primary" style="width:100%">Add Question</button>
+	  <!-- {{ formset.management_form }} -->
+          <!-- {% for form in formset %} -->
+	  <!-- {{ form }} -->
+	  <!-- {% endfor %} -->
+	  <button class="btn btn-primary" style="width:100%">change Question</button>
+	</form>
       </div>
-      </form>
+      <h2>Choices</h2>
       <div>
-	<h2>{{question.question_text}}</h2>
-	<h2>{{question.question_type}}</h2>
 	{% for c in choice%}
-	<h2>{{c.choice_text}}</h2>
-	<h2>{{c.id}}</h2>
-
+	<p>
+	  {{c.choice_text}}
+	  <button class="btn btn-danger" style="width:10%">delete</button> 
+	</p>
 	{% endfor%}
+
+
+	<div style="width:30%">
+	<form action="" method="post">
+	  {%csrf_token%}
+	  {% for error in form.non_field_errors %}
+	  <div class="form-group has-errors text-danger small">
+	    {{error}}
+	  </div>
+	  {% endfor %}
+	  {% for field in newChoiceform %}
+	  <div class="form-group has-errors text-danger small">
+	    {{field.errors}}
+	  </div>
+	  <div class="form-group has-errors text-danger small">
+	  </div>
+	  <div class="form-group">
+	    {{field.label}}
+	    {{field}}
+	  </div>
+	  {% endfor %}
+	  <button class="btn btn-primary" style="width:100%">add choice</button>
+	</form>
+      </div>
+
+
+
+	
+	</div>
+
 
 	
       </div>

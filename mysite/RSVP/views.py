@@ -7,14 +7,12 @@ from django.utils import timezone
 from django.contrib.auth import logout
 from .forms import EventForm, Questionform, Choiceform
 from django.forms import formset_factory
-from .forms import UserCreationForm,inviteNewGuestform,inviteNewOwnerform,inviteNewVendorform
+from .forms import UserCreationForm,inviteNewGuestform,inviteNewOwnerform,inviteNewVendorform,newChoiceform
 
 def questionPageCreate(request,event_id):
-    ChoiceFormSet = formset_factory(Choiceform, extra = 3)
     if request.method == 'POST':
         QuestionForm = Questionform(request.POST)
-        formset = ChoiceFormSet(request.POST)
-        if QuestionForm.is_valid() and formset.is_valid():
+        if QuestionForm.is_valid():
             question_text = QuestionForm.cleaned_data['question_text']
             question_type = QuestionForm.cleaned_data['question_type']
             isEditable =  QuestionForm.cleaned_data['isEditable']
@@ -27,31 +25,22 @@ def questionPageCreate(request,event_id):
                 isOptional=isOptional,
             )
             question.save()
-
-
+            return redirect('..')
             
-            for ChoiceForm in formset:
-                choice_text = ChoiceForm.cleaned_data['choice_text']
-                choice = Choice(question_id=question.id,
-                                choice_text=choice_text)
-                choice.save()
-            return HttpResponse("success")
     else:
         QuestionForm = Questionform()
-        formset = ChoiceFormSet()
     return render(request,'RSVP/questionPage.html',{
         'Questionform': QuestionForm,
-        'formset': formset,        
+        
     })
 
 def questionPageEdit(request, event_id, question_id):
     question = get_object_or_404(Question,pk=question_id)
     choice = Choice.objects.filter(question=question)
-    ChoiceFormSet = formset_factory(Choiceform, extra = 3)
     if request.method == 'POST':
         QuestionForm = Questionform(request.POST)
-        formset = ChoiceFormSet(request.POST)
-        if QuestionForm.is_valid() and formset.is_valid():
+        newChoiceForm = newChoiceform(request.POST)
+        if QuestionForm.is_valid():
             question_text = QuestionForm.cleaned_data['question_text']
             question_type = QuestionForm.cleaned_data['question_type']
             isEditable =  QuestionForm.cleaned_data['isEditable']
@@ -62,18 +51,20 @@ def questionPageEdit(request, event_id, question_id):
             question.isEditable = isEditable
             question.isOptional = isOptional
             question.save()
-#            for ChoiceForm in formset:
-#                choice_text = ChoiceForm.cleaned_data['choice_text']
- #               choice = Choice(question_id=question_id,
- #                               choice_text=choice_text)
- #               choice.save()
-#            return HttpResponse("success")
-    else:
-        QuestionForm = Questionform()
-        formset = ChoiceFormSet()
+            
+        if newChoiceForm.is_valid():
+            newChoiceText = newChoiceForm.cleaned_data.get('choice_text')
+            newChoice = Choice(
+                question = question,
+                choice_text = newChoiceText
+            )
+            newChoice.save()
+
+    newChoiceForm = newChoiceform()
+    QuestionForm = Questionform() 
     return render(request,'RSVP/questionPage.html',{
+        'newChoiceform':newChoiceForm,
         'Questionform': QuestionForm,
-        'formset': formset,
         'question':question,
         'choice':choice,
     })
@@ -96,9 +87,11 @@ def event_create(request):
                                    register_state ='1' 
             )
             register.save()
-            return HttpResponse("Hello, world")
-        else:
-            return HttpResponse("Error")
+        return redirect('../home')
+
+        #     return HttpResponse("Hello, world")
+        # else:
+        #     return HttpResponse("Error")
     else:
         form = EventForm()
     #form.fields['event_name'].widget.attrs['readonly'] = True # disable a form!
