@@ -38,30 +38,34 @@ def questionPageEdit(request, event_id, question_id):
     question = get_object_or_404(Question,pk=question_id)
     choice = Choice.objects.filter(question=question)
     if request.method == 'POST':
-        QuestionForm = Questionform(request.POST)
-        newChoiceForm = newChoiceform(request.POST)
-        if QuestionForm.is_valid():
-            question_text = QuestionForm.cleaned_data['question_text']
-            question_type = QuestionForm.cleaned_data['question_type']
-            isEditable =  QuestionForm.cleaned_data['isEditable']
-            isOptional =  QuestionForm.cleaned_data['isOptional']
-            question = Question.objects.get(pk = question_id)
-            question.question_text = question_text
-            question.question_type = question_type
-            question.isEditable = isEditable
-            question.isOptional = isOptional
-            question.save()
-            
-        if newChoiceForm.is_valid():
-            newChoiceText = newChoiceForm.cleaned_data.get('choice_text')
-            newChoice = Choice(
+        if request.POST.get('changeQuestion'):
+            QuestionForm = Questionform(request.POST)
+            if QuestionForm.is_valid():
+                question_text = QuestionForm.cleaned_data['question_text']
+                question_type = QuestionForm.cleaned_data['question_type']
+                isEditable =  QuestionForm.cleaned_data['isEditable']
+                isOptional =  QuestionForm.cleaned_data['isOptional']
+                question = Question.objects.get(pk = question_id)
+                question.question_text = question_text
+                question.question_type = question_type
+                question.isEditable = isEditable
+                question.isOptional = isOptional
+                question.save()
+        elif request.POST.get('add_choice'):
+            newChoiceForm = newChoiceform(request.POST)
+            if newChoiceForm.is_valid():
+                newChoiceText = newChoiceForm.cleaned_data.get('choice_text')
+                newChoice = Choice(
                 question = question,
                 choice_text = newChoiceText
-            )
-            newChoice.save()
-
+                )
+                newChoice.save()
+        elif request.POST.get('delete'):
+            toBeDeleted = Choice.objects.filter(pk=request.POST.get('delete'))
+            toBeDeleted.delete()
+            
     newChoiceForm = newChoiceform()
-    QuestionForm = Questionform() 
+    QuestionForm = Questionform()
     return render(request,'RSVP/questionPage.html',{
         'newChoiceform':newChoiceForm,
         'Questionform': QuestionForm,

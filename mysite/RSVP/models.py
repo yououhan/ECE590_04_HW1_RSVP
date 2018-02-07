@@ -88,6 +88,7 @@ class Question(models.Model):
     #     )
         
 class Choice(models.Model):
+    id = models.AutoField(primary_key=True)
     question = models.ForeignKey(
         Question,
         on_delete=models.CASCADE,#When the referenced object is deleted, also delete the objects that have references to it (When you remove a blog post for instance, you might want to delete comments as well).

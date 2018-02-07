@@ -64,18 +64,22 @@
           <!-- {% for form in formset %} -->
 	  <!-- {{ form }} -->
 	  <!-- {% endfor %} -->
-	  <button class="btn btn-primary" style="width:100%">change Question</button>
+	  <button class="btn btn-primary" style="width:100%" name="changeQuestion" type="submit
+" value="changeQuestion">change Question</button>
 	</form>
       </div>
       <h2>Choices</h2>
-      <div>
-	{% for c in choice%}
-	<p>
-	  {{c.choice_text}}
-	  <button class="btn btn-danger" style="width:10%">delete</button> 
-	</p>
-	{% endfor%}
-
+      <form method="post" action="">
+	{%csrf_token%}
+	<div>
+	  {% for c in choice%}
+	  <p>
+	    {{c.choice_text}}
+	    <button class="btn btn-danger" style="width:10%" name="delete" type = "submit" value="{{c.id}}">delete</button> 
+	  </p>
+	  {% endfor%}
+	</div>
+      </form>
 
 	<div style="width:30%">
 	<form action="" method="post">
@@ -96,7 +100,7 @@
 	    {{field}}
 	  </div>
 	  {% endfor %}
-	  <button class="btn btn-primary" style="width:100%">add choice</button>
+	  <button class="btn btn-primary" style="width:100%" name="add_choice" type="submit" value="add_choice">add choice</button>
 	</form>
       </div>
 

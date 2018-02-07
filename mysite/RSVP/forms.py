@@ -24,7 +24,7 @@ class Questionform(ModelForm):
 class Choiceform(ModelForm):
     class Meta:
         model = Choice
-        fields = ['choice_text']
+        fields = ['choice_text','id']
 
 
 class UserCreationForm(UserCreationForm):
