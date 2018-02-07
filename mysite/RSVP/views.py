@@ -205,6 +205,7 @@ def events_list(request, event_id):
     
     return render(request, 'RSVP/events_list.html', {
         'event': event,
+        'event_name':event.event_name,
         'guestPending':guestPending,
         'guestPass':guestPass,
         'guestNum':guestNum,
