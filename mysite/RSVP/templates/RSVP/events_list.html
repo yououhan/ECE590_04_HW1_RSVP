@@ -48,9 +48,12 @@
 	<div class="col-md-12 mb-3">
 	  <h3>{{event.event_time}}</h3>
 	</div>
-	<div class="col-md-4 mb-3">
-	  <button type="button" class="btn btn-danger">delete this event</button>
-	</div>
+	<form method="post" action="../">
+	  {%csrf_token%}
+	  <div class="col-md-4 mb-3">
+	    <button type="button" class="btn btn-danger" name="delete_event" value="delete_event" type="submit">delete this event</button>
+	  </div>
+	</form>
 	<!--    </form> -->
       </div>
       <hr>
@@ -92,7 +95,7 @@
 		{{error}}
 	      </div>
 	      {% endfor %}
-	      {% for field in inviteNewGuestform %}
+	      {% for field in inviteNewUserform %}
 	      <div class="form-group has-errors text-danger small">
 		{{field.errors}}
 	      </div>
@@ -103,7 +106,7 @@
 		{{field}}
 	      </div>
 	      {% endfor %}
-	      <button class="btn btn-primary" style="width:100%">invite new guest</button>
+	      <button class="btn btn-primary" style="width:100%" name="invite" value="2">invite new guest</button>
 	      </form>
 	    </div>
 	    
@@ -152,7 +155,7 @@
 		{{error}}
 	      </div>
 	      {% endfor %}
-	      {% for field in inviteNewVendorform %}
+	      {% for field in inviteNewUserform %}
 	      <div class="form-group has-errors text-danger small">
 		{{field.errors}}
 	      </div>
@@ -163,12 +166,9 @@
 		{{field}}
 	      </div>
 	      {% endfor %}
-	      <button class="btn btn-primary" style="width:100%">invite new vendor</button>
+	      <button class="btn btn-primary" style="width:100%" name="invite" value="1">invite new vendor</button>
 	      </form>
 	    </div>
-	    
-
-
 	      
 
 	    </div>
@@ -205,7 +205,6 @@
 		    {% endfor %}
 		  </div>
 		</div>
-
 	    <div style="width:30%">
 	      <form action="" method="post">
 		{%csrf_token%}
@@ -214,7 +213,7 @@
 		{{error}}
 	      </div>
 	      {% endfor %}
-	      {% for field in inviteNewOwnerform %}
+	      {% for field in inviteNewUserform %}
 	      <div class="form-group has-errors text-danger small">
 		{{field.errors}}
 	      </div>
@@ -225,12 +224,9 @@
 		{{field}}
 	      </div>
 	      {% endfor %}
-	      <button class="btn btn-primary" style="width:100%">invite new Owner</button>
+	      <button class="btn btn-primary" style="width:100%" name="invite" value="0">invite new owner</button>
 	      </form>
 	    </div>
-	    
-
-
 
 	      </div>
 	    </div>

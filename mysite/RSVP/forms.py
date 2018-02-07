@@ -19,7 +19,7 @@ class Questionform(ModelForm):
     class Meta:
         model = Question
         fields = ['question_text', 'question_type', 'isEditable', 'isOptional']
-        widgets = {'question_text' : forms.TextInput(attrs={'placeholder': '11111'})}
+#        widgets = {'question_text' : forms.TextInput(attrs={'placeholder': '11111'})}
                 
 class Choiceform(ModelForm):
     class Meta:
@@ -44,15 +44,9 @@ class UserCreationForm(UserCreationForm):
     #         user.save()
     #     return user
 
-class inviteNewGuestform(forms.Form):
-    newGuest_userName = forms.CharField(label='New Guest userName', max_length=100)
-        
-class inviteNewOwnerform(forms.Form):
-    newOwner_userName = forms.CharField(label='New Owner userName', max_length=100)
-        
-class inviteNewVendorform(forms.Form):
-    newVendor_userName = forms.CharField(label='New Vendor userName', max_length=100)
-        
+class inviteNewUserform(forms.Form):
+    username = forms.CharField(label='Invitee username', max_length=100)
+                
 class newChoiceform(forms.Form):
     choice_text = forms.CharField(label='new choice',max_length=100)
 
