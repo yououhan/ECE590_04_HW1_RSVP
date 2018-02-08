@@ -22,7 +22,7 @@ def questionAnswer(request, event_id):
     if request.method == 'POST':
         questionIds = Question.objects.values_list('id').filter(event=event_id, question_type='S')
         for id in questionIds:
-            return HttpResponse(request.POST['51'])
+            return HttpResponse(request.POST[])
             return HttpResponse(id)
 #    QuestionFormSet = inlineformset_factory(Question, Choice, fields=('context_',), can_delete = False)
     multiChoiceQuestions = Question.objects.filter(event=event_id, question_type='S')

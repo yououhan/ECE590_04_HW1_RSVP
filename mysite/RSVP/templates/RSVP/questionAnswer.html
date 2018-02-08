@@ -1,1 +1,15 @@
-{{multiChoiceAnswerform}}
+<form method="post" action="">
+  {%csrf_token%}
+  {% for question in multiChoiceQuestions%}
+  {{question.question_text}}
+  {% for choice in choices %}
+  {% if choice.question_id == question.id %}
+  <div class="custom-control custom-radio">
+    <input type="radio" id="{{choice.id}}" name="{{question.id}}" class="custom-control-input">
+    <label class="custom-control-label" for="{{choice.id}}" value="1">{{choice.choice_text}}</label>
+  </div>
+  {% endif %}
+  {% endfor %}
+  {% endfor %}
+  <button class="btn btn-danger" style="width:20%" type="submit">Submit</button> 
+</form>
