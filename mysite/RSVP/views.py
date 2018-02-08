@@ -1,3 +1,5 @@
+import django
+from django.conf import settings
 from django.shortcuts import get_object_or_404, render,redirect
 from .models import Event,RegisterEvent,Question, Choice
 from django.contrib.auth import login, authenticate
@@ -9,6 +11,8 @@ from .forms import EventForm, Questionform, Choiceform
 from django.forms import formset_factory
 from .forms import UserCreationForm, inviteNewUserform,newChoiceform
 from django import forms
+from django.core.mail import send_mail
+
 def makeMultiChoiceAnswerform(question):
     choicesQueryset = Choice.objects.filter(question=question.id)
     class multiChoiceAnswerform(forms.Form):
@@ -78,6 +82,13 @@ def questionPageEdit(request, event_id, question_id):
                 )
                 newChoice.save()
         elif request.POST.get('delete'):
+            send_mail(
+                'Is that easy?',
+                'I do not think so',
+                'yiweiliant@gmail.com',
+                ['yiweiliant@outlook.com'],
+                fail_silently=False,
+            )
             toBeDeleted = Choice.objects.filter(pk=request.POST.get('delete'))
             toBeDeleted.delete()
         elif request.POST.get('deleteQ'):
@@ -112,11 +123,21 @@ def event_create(request):
                                    register_state ='1' 
             )
             register.save()
-        return redirect('../home')
-
-        #     return HttpResponse("Hello, world")
-        # else:
-        #     return HttpResponse("Error")
+            if form.cleaned_data['plusOne']:
+                question=Question(event=event,
+                                  question_text="will you have anyone come with you?",
+                                  question_type='S'
+                )
+                question.save()
+                no=Choice(question=question,
+                          choice_text="NO"
+                )
+                no.save()
+                yes=Choice(question=question,
+                           choice_text="YES"
+                )
+                yes.save()
+            return redirect('../home')
     else:
         form = EventForm()
     #form.fields['event_name'].widget.attrs['readonly'] = True # disable a form!

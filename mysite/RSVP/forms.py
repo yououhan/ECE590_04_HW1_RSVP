@@ -10,6 +10,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 
 class EventForm(ModelForm):
+    plusOne = forms.BooleanField(label='can guest +1?',required=False)    
     class Meta:
         model = Event
         fields = ['event_name', 'event_time']
