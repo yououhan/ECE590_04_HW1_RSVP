@@ -7,6 +7,7 @@ from . import views
 
 urlpatterns = [
     path('event/<int:event_id>/questionPage/<int:question_id>',views.questionPageEdit,name='questionPageEdit'),
+    path('event/<int:event_id>/questionFinalize/<int:question_id>',views.questionFinalize,name='questionFinalize'),
     path('event/<int:event_id>/questionPage/',views.questionPageCreate,name='questionPageCreate'),
     path('event/<int:event_id>/questionAnswer/',views.questionAnswer,name='questionAnswer'),
     path('event/<int:event_id>/questionView/<int:guest_id>',views.questionAnswer,name='questionAnswer'),
