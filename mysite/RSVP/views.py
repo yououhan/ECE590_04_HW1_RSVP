@@ -111,8 +111,25 @@ def questionPageCreate(request,event_id):
         'Questionform': QuestionForm,
         
     })
-
+def questionFinalize(request, event_id, question_id):
+    event = get_object_or_404(Event, pk=event_id)
+    registerEvent = get_object_or_404(RegisterEvent, user=request.user, event = event, identity = '1')
+    question = get_object_or_404(Question,pk=question_id, isVisible=True)
+    choices = Choice.objects.filter(question=question)
+    if request.method == 'POST':
+        question.isEditable = not question.isEditable
+        question.save()
+    return render(request,'RSVP/questionFinalize.html',{
+        'question_text':question.question_text,
+        'question_type':question.question_type,
+        'question_isEditable':question.isEditable,
+        'choices':choices,
+    })
+        
+    
 def questionPageEdit(request, event_id, question_id):
+    event = get_object_or_404(Event, pk=event_id)
+    registerEvent = get_object_or_404(RegisterEvent, user=request.user, event = event, identity = '0')
     question = get_object_or_404(Question,pk=question_id)
     choice = Choice.objects.filter(question=question)
     if request.method == 'POST':
