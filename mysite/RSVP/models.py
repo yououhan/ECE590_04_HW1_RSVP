@@ -73,7 +73,7 @@ class Question(models.Model):
     event = models.ForeignKey(
         Event,
         on_delete = models.CASCADE
-        )
+    )
     question_text = models.CharField(max_length = QUESTION_TEXT_MAX_LENGTH)
     question_type = models.CharField(max_length = 1, choices = QUESTION_TYPES_CHOICES)
     isEditable = models.BooleanField(default = True)

@@ -54,12 +54,14 @@ def questionPageCreate(request,event_id):
             question_type = QuestionForm.cleaned_data['question_type']
             isEditable =  QuestionForm.cleaned_data['isEditable']
             isOptional =  QuestionForm.cleaned_data['isOptional']
+            isVisible = QuestionForm.cleaned_data['isVisible']
             question = Question(
                 event= get_object_or_404(Event,pk = event_id),
                 question_text=question_text,
                 question_type=question_type,
                 isEditable=isEditable,
                 isOptional=isOptional,
+                isVisible=isVisible
             )
             question.save()
             return redirect('..')
@@ -98,14 +100,15 @@ def questionPageEdit(request, event_id, question_id):
                 )
                 newChoice.save()
         elif request.POST.get('delete'):
+            toBeDeleted = Choice.objects.get(pk=request.POST.get('delete'))
+            mailMessage = 'the choice '+ toBeDeleted.choice_text +' in the question '+ question.question_text
             send_mail(
                 'Is that easy?',
-                'I do not think so',
+                mailMessage,
                 'yiweiliant@gmail.com',
                 ['yiweiliant@outlook.com'],
                 fail_silently=False,
             )
-            toBeDeleted = Choice.objects.filter(pk=request.POST.get('delete'))
             toBeDeleted.delete()
         elif request.POST.get('deleteQ'):
             toDeleteQuestion = Question.objects.get(pk=question_id)
@@ -211,9 +214,14 @@ def home(request):
 #n    return render(request, 'RSVP/home.html')
 
 def events_list(request, event_id):
+    user = request.user
+    event = get_object_or_404(Event, pk = event_id)
+    permission = get_object_or_404(RegisterEvent,event = event,user=user)
+  #  if permission.identity == '0':
+  #      return HttpResponse('success')
+   
     if request.method == 'POST':
         if request.POST.get('delete_event'):
-            event = get_object_or_404(Event, pk=event_id)
             event.delete()
             return redirect('../../home/')
         elif request.POST.get('invite'):
@@ -229,9 +237,7 @@ def events_list(request, event_id):
                 )
                 newInvite.save()
       
-                
-    username = request.user.username
-    event = get_object_or_404(Event, pk = event_id)
+    username=user.username            
     questions = Question.objects.filter(event=event)
 
     guest = RegisterEvent.objects.filter(event=event,identity=2)
