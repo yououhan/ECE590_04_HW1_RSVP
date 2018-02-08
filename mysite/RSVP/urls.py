@@ -9,6 +9,7 @@ urlpatterns = [
     path('event/<int:event_id>/questionPage/<int:question_id>',views.questionPageEdit,name='questionPageEdit'),
     path('event/<int:event_id>/questionPage/',views.questionPageCreate,name='questionPageCreate'),
     path('event/<int:event_id>/questionAnswer/',views.questionAnswer,name='questionAnswer'),
+    path('event/<int:event_id>/questionView/<int:guest_id>',views.questionAnswer,name='questionAnswer'),
     path('sign_in', views.sign_in, name='sign_in'),
     path('home/', views.home, name='home'),
     path('event/<int:event_id>/', views.events_list, name='events_list'),

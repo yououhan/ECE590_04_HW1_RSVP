@@ -1,7 +1,7 @@
 import django
 from django.conf import settings
 from django.shortcuts import get_object_or_404, render,redirect
-from .models import Event,RegisterEvent,Question, Choice, MultiChoicesResponse
+from .models import Event,RegisterEvent,Question, Choice, MultiChoicesResponse, TextResponse
 from django.contrib.auth import login, authenticate
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.contrib.auth import logout
 from .forms import EventForm, Questionform, Choiceform
 from django.forms import formset_factory
-from .forms import UserCreationForm, inviteNewUserform,newChoiceform
+from .forms import UserCreationForm, inviteNewUserform,newChoiceform, TextResponseform
 from django import forms
 from django.core.mail import send_mail
 from django.forms import inlineformset_factory
@@ -23,10 +23,12 @@ def makeMultiChoiceAnswerform(question):
 
 def questionAnswer(request, event_id):
     multiChoiceQuestions = Question.objects.filter(event=event_id, question_type='S')
+    textQuestions = Question.objects.filter(event=event_id, question_type='T')
+#    textResponseFormSet = inlineformset_factory(Event, Question, fields=('question_text',))
+    event = get_object_or_404(Event, pk=event_id)
     if request.method == 'POST':
-        event = get_object_or_404(Event, pk=event_id)
+        registerEvent = get_object_or_404(RegisterEvent, event=event, user=request.user, identity='2')
         for question in multiChoiceQuestions:
-            registerEvent = get_object_or_404(RegisterEvent, event=event, user=request.user, identity='2')
             multiChoicesResponse = MultiChoicesResponse(
                 question = question,
                 register_event=registerEvent,
@@ -34,20 +36,31 @@ def questionAnswer(request, event_id):
                 last_updated_time = timezone.now()
             )
             multiChoicesResponse.save()
-        return redirect('../../home')
+        for question in textQuestions:
+            textResponse = TextResponse(
+                question = question,
+                register_event = registerEvent,
+                answer = request.POST.get(str(question.id)),
+                last_updated_time = timezone.now()
+            )
+            textResponse.save()
+        return redirect('../../../home')
     questionIds = Question.objects.values_list('id').filter(event=event_id, question_type='S')
-    questionIds = Question.objects.values_list('id').filter(event=event_id, question_type='S')
+#    questionIds = Question.objects.values_list('id').filter(event=event_id, question_type='S')
 #    question = multiChoiceQuestions.first()
 #    MultiChoiceAnswerFormset = formset_factory(MultiChoiceAnswerform)
 #    for question in multiChoiceQuestions:
     choices = Choice.objects.filter(question__in=questionIds)
-        
+#    textResponseFS = textResponseFormSet(instance=event)
+#    return HttpResponse(textResponseFS)
     #formset = QuestionFormSet(instance=question)
 #    multiChoiceAnswerForm = makeMultiChoiceAnswerform(question)
 #        addToFormset(multiChoiceAnswerForm)
     return render(request, 'RSVP/questionAnswer.html',{
         'choices':choices,
-        'multiChoiceQuestions':multiChoiceQuestions
+        'multiChoiceQuestions':multiChoiceQuestions,
+        'textQuestions':textQuestions,
+#        'textResponseFormSet':textResponseFS,
 #        'multiChoiceQuestions':multiChoiceQuestions,
 #        'multiChoiceAnswerform':formset,#multiChoiceAnswerForm,
  #       'multiChoiceAnswerformset':multiChoiceAnswerFormset,

@@ -1,7 +1,7 @@
 from django import forms
 import datetime
 from django.forms import ModelForm
-from .models import Event, Question, Choice
+from .models import Event, Question, Choice, TextResponse
 from django.forms import MultiWidget
 from django.forms.widgets import SelectDateWidget
 from django.forms import EmailField
@@ -51,3 +51,8 @@ class inviteNewUserform(forms.Form):
 class newChoiceform(forms.Form):
     choice_text = forms.CharField(label='new choice',max_length=100)
     
+class TextResponseform(ModelForm):
+    class Meta:
+        model = TextResponse
+        fields = ['answer']
+
