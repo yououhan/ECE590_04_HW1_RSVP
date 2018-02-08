@@ -79,6 +79,7 @@ class Question(models.Model):
     isEditable = models.BooleanField(default = True)
     isOptional = models.BooleanField(default = False)
     last_updated_time = models.DateTimeField('last updated time', auto_now = True)
+    isVisible = models.BooleanField(default = True)
     def __str__(self):
         return self.question_text
     # choices = ArrayField(
@@ -112,7 +113,11 @@ class MultiChoicesResponse(models.Model):
         )
     class Meta:
         unique_together = (("question", "register_event"),)
-    answer = models.CharField(max_length = MULTICHOICES_RESPONSE_MAX_LENGTH)
+    #answer = models.CharField(max_length = MULTICHOICES_RESPONSE_MAX_LENGTH)
+    answer = models.ForeignKey(
+        Choice,
+        on_delete=models.CASCADE
+        )
     last_updated_time = models.DateTimeField('last updated time')
     def __str__(self):
         return '%s reponsed to %s' % (self.register_event.user, self.question.question_text)
