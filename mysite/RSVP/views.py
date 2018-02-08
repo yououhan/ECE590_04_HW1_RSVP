@@ -21,6 +21,25 @@ def makeMultiChoiceAnswerform(question):
         choices = forms.ModelChoiceField(queryset=choicesQueryset)
     return multiChoiceAnswerform
 
+def questionAnswerView(request,event_id,guest_id):
+    user = request.user
+    event=get_object_or_404(Event,pk = event_id)
+    permission = get_object_or_404(RrgisterEvent,event=event,user=user)
+    if permission.identity == '2':
+        return questionAnswer(request,event_id)
+    else:
+        return questionAnserAll(request,event_id,guest_id,permission.identity)
+
+def questionAnswerAll(request,event_id,guest_id,permission):
+    user=request.user
+    event=get_object_or_404(Event,pk=event_id)
+    guest=get_object_or_404(User,pk=guest_id)
+    guestAccess=get_object_or_404(RegisterEvnet,event=event,user=guest)
+    if guestAccess == '2':
+#        return 
+#    else:
+        return HttpResponse('seems that the guest is not in this event')
+    
 def questionAnswer(request, event_id):
     multiChoiceQuestions = Question.objects.filter(event=event_id, question_type='S')
     textQuestions = Question.objects.filter(event=event_id, question_type='T')
@@ -232,14 +251,44 @@ def home(request):
     })
     # View code here...
 #n    return render(request, 'RSVP/home.html')
-
-def events_list(request, event_id):
+def events_list(request,event_id):
     user = request.user
-    event = get_object_or_404(Event, pk = event_id)
-    permission = get_object_or_404(RegisterEvent,event = event,user=user)
-  #  if permission.identity == '0':
-  #      return HttpResponse('success')
-   
+    event = get_object_or_404(Event,pk = event_id)
+    permission = get_object_or_404(RegisterEvent,event=event,user=user)
+    if permission.identity == '0':
+        return events_list_owner(request,event)
+    elif permission.identity == '1':
+        return events_list_vender(request,event)
+    else:
+        return HttpResponse('you have on access to this page(will be better)')
+
+
+
+def events_list_vender(request, event):
+
+    username=request.user.username            
+    questions = Question.objects.filter(event=event)
+
+    guest = RegisterEvent.objects.filter(event=event,identity=2)
+    guestPending = guest.filter(register_state=0)
+    guestPass = guest.filter(register_state=1)
+    guestNum = guestPass.count()
+
+    return render(request, 'RSVP/events_list.html', {
+        'event': event,
+        'permission':'1',
+        'event_name':event.event_name,
+        'guestPending':guestPending,
+        'guestPass':guestPass,
+        'guestNum':guestNum,
+        'questions':questions,
+        'timeNow':timezone.now(),
+        'username':username,
+    })
+
+
+    
+def events_list_owner(request, event):
     if request.method == 'POST':
         if request.POST.get('delete_event'):
             event.delete()
@@ -256,8 +305,7 @@ def events_list(request, event_id):
                     register_state='0'
                 )
                 newInvite.save()
-      
-    username=user.username            
+    username=request.user.username            
     questions = Question.objects.filter(event=event)
 
     guest = RegisterEvent.objects.filter(event=event,identity=2)
@@ -278,6 +326,7 @@ def events_list(request, event_id):
     
     return render(request, 'RSVP/events_list.html', {
         'event': event,
+        'permission':'0',
         'event_name':event.event_name,
         'guestPending':guestPending,
         'guestPass':guestPass,

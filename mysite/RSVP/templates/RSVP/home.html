@@ -129,7 +129,7 @@
         <p>you can click to change your answer</p>
         {% for event in guestEvents %}
 	{% if event.event.event_time > timeNow%}
-        <p><a class="btn btn-secondary" href="../event/{{event.event.id}}" role="button">{{event.event}} &raquo;</a></p>
+        <p><a class="btn btn-secondary" href="../event/{{event.event.id}}/questionAnswer" role="button">{{event.event}} &raquo;</a></p>
 	{% endif%}
         {% endfor %}
       </div>
@@ -167,7 +167,7 @@
         <p>click to view more</p>
 	{% for event in guestEvents %}
 	{% if event.event.event_time < timeNow%}
-	<p><a class="btn btn-secondary" href="../event/{{event.event.id}}" role="button">{{event.event}} &raquo;</a></p>
+	<p><a class="btn btn-secondary" href="../event/{{event.event.id}}/questionAnswer" role="button">{{event.event}} &raquo;</a></p>
 	{% endif%}
 	{% endfor %}	
       </div>

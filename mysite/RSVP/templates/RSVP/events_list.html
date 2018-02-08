@@ -48,12 +48,14 @@
 	<div class="col-md-12 mb-3">
 	  <h3>{{event.event_time}}</h3>
 	</div>
+	{% if permission == '0'%}
 	<form method="post" action="">
 	  {%csrf_token%}
 	  <div class="col-md-4 mb-3">
 	    <button type="submit" class="btn btn-danger" name="delete_event" value="{{event.id}}" type="submit">delete this event</button>
 	  </div>
 	</form>
+	{% endif %}
       </div>
       <hr>
 
@@ -71,7 +73,7 @@
   	    </button>
   	    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
 	      {% for people in guestPass %}
-    	      <a class="dropdown-item" href="#">{{people.user}}</a>
+    	      <a class="dropdown-item" href="./questionView/{{people.user.id}}">{{people.user}}</a>
 	      {% endfor %}
 	    </div>  
 	    <div class="btn-group">
@@ -85,6 +87,7 @@
 	      </div>
 	    </div>
 
+	{% if permission == '0'%}
 
 	    <div style="width:30%">
 	      <form action="" method="post">
@@ -249,6 +252,6 @@
 	      </button>
 	    </div>
 	  </div>
-
+{% endif%}
   </body>
 </html>

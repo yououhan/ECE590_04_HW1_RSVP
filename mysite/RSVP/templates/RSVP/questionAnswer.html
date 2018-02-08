@@ -1,6 +1,7 @@
 <form method="post" action="">
   {%csrf_token%}
   {% for question in multiChoiceQuestions%}
+  
   {{question.question_text}}
   {% for choice in choices %}
   {% if choice.question_id == question.id %}
