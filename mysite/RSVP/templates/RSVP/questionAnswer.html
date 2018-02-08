@@ -5,8 +5,8 @@
   {% for choice in choices %}
   {% if choice.question_id == question.id %}
   <div class="custom-control custom-radio">
-    <input type="radio" id="{{choice.id}}" name="{{question.id}}" class="custom-control-input">
-    <label class="custom-control-label" for="{{choice.id}}" value="1">{{choice.choice_text}}</label>
+    <input type="radio" name="{{question.id}}" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
+    <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br>
   </div>
   {% endif %}
   {% endfor %}

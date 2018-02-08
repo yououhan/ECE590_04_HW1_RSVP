@@ -1,7 +1,7 @@
 import django
 from django.conf import settings
 from django.shortcuts import get_object_or_404, render,redirect
-from .models import Event,RegisterEvent,Question, Choice
+from .models import Event,RegisterEvent,Question, Choice, MultiChoicesResponse
 from django.contrib.auth import login, authenticate
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
@@ -22,13 +22,20 @@ def makeMultiChoiceAnswerform(question):
     return multiChoiceAnswerform
 
 def questionAnswer(request, event_id):
-    if request.method == 'POST':
-        questionIds = Question.objects.values_list('id').filter(event=event_id, question_type='S')
-        for id in questionIds:
-            return HttpResponse(request.POST['51'])
-            return HttpResponse(id)
-#    QuestionFormSet = inlineformset_factory(Question, Choice, fields=('context_',), can_delete = False)
     multiChoiceQuestions = Question.objects.filter(event=event_id, question_type='S')
+    if request.method == 'POST':
+        event = get_object_or_404(Event, pk=event_id)
+        for question in multiChoiceQuestions:
+            registerEvent = get_object_or_404(RegisterEvent, event=event, user=request.user, identity='2')
+            multiChoicesResponse = MultiChoicesResponse(
+                question = question,
+                register_event=registerEvent,
+                answer = Choice.objects.get(pk=request.POST.get(str(question.id))),
+                last_updated_time = timezone.now()
+            )
+            multiChoicesResponse.save()
+        return redirect('../../home')
+    questionIds = Question.objects.values_list('id').filter(event=event_id, question_type='S')
     questionIds = Question.objects.values_list('id').filter(event=event_id, question_type='S')
 #    question = multiChoiceQuestions.first()
 #    MultiChoiceAnswerFormset = formset_factory(MultiChoiceAnswerform)
