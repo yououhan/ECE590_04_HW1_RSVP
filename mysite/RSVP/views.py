@@ -13,6 +13,7 @@ from .forms import UserCreationForm, inviteNewUserform,newChoiceform, TextRespon
 from django import forms
 from django.core.mail import send_mail
 from django.forms import inlineformset_factory
+from django.core.exceptions import ObjectDoesNotExist
 
 def makeMultiChoiceAnswerform(question):
     choicesQueryset = Choice.objects.filter(question=question.id)
@@ -55,32 +56,54 @@ def questionAnswer(request, event_id):
     questionWithResponses = []
     for question in multiChoiceQuestions:
         choices = Choice.objects.filter(question=question)
-        response = MultiChoicesResponse.objects.get(question=question, register_event=registerEvent)
-        questionWithResponses.append(QuestionWithResponse(question, choices, response))
+        try:
+            response = MultiChoicesResponse.objects.get(question=question, register_event=registerEvent)
+        except ObjectDoesNotExist:
+            pass
+        questionWithResponses.append(QuestionWithResponse(question, choices, None))
     for question in textQuestions:
         choices = Choice.objects.filter(question=question)
-        response = TextResponse.objects.get(question=question, register_event=registerEvent)
-        questionWithResponses.append(QuestionWithResponse(question, choices, response))
+        try:
+            response = TextResponse.objects.get(question=question, register_event=registerEvent)
+        except ObjectDoesNotExist:
+            pass
+        questionWithResponses.append(QuestionWithResponse(question, choices, None))
         #return HttpResponse(response.first().answer)
  #   questionWithResponse.response = '111111'
     #multiChoicesResponses = MultiChoicesResponse.objects.filter(question=question, register_event=registerEvent)
     #textResponses = TextResponse.objects.filter(question=question, register_event=registerEvent)
     if request.method == 'POST':
         for question in multiChoiceQuestions:
-            multiChoicesResponse = MultiChoicesResponse(
-                question = question,
+            multiChoicesResponse, created = MultiChoicesResponse.objects.update_or_create(
+                question=question,
                 register_event=registerEvent,
-                answer = Choice.objects.get(pk=request.POST.get(str(question.id))),
-                last_updated_time = timezone.now()
+                defaults={
+                    'answer': Choice.objects.get(pk=request.POST.get(str(question.id))),
+                    'last_updated_time': timezone.now()
+                }
             )
+            # multiChoicesResponse = MultiChoicesResponse(
+            #     question = question,
+            #     register_event=registerEvent,
+            #     answer = Choice.objects.get(pk=request.POST.get(str(question.id))),
+            #     last_updated_time = timezone.now()
+            # )
             multiChoicesResponse.save()
         for question in textQuestions:
-            textResponse = TextResponse(
-                question = question,
-                register_event = registerEvent,
-                answer = request.POST.get(str(question.id)),
-                last_updated_time = timezone.now()
+            textResponse, created = TextResponse.objects.update_or_create(
+                question=question,
+                register_event=registerEvent,
+                defaults={
+                    'answer': request.POST.get(str(question.id)),
+                    'last_updated_time': timezone.now()
+                }
             )
+            # textResponse = TextResponse(
+            #     question = question,
+            #     register_event = registerEvent,
+            #     answer = request.POST.get(str(question.id)),
+            #     last_updated_time = timezone.now()
+            # )
             textResponse.save()
         return redirect('../../../home')
     questionIds = Question.objects.values_list('id').filter(event=event_id, question_type='S')
