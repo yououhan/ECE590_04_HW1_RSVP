@@ -15,31 +15,31 @@ from django.core.mail import send_mail
 from django.forms import inlineformset_factory
 from django.core.exceptions import ObjectDoesNotExist
 
-def makeMultiChoiceAnswerform(question):
-    choicesQueryset = Choice.objects.filter(question=question.id)
-    class multiChoiceAnswerform(forms.Form):
-        question_text = forms.CharField(widget=forms.TextInput(attrs={'placeholder': question.question_text}),disabled = True, label=False)
-        choices = forms.ModelChoiceField(queryset=choicesQueryset)
-    return multiChoiceAnswerform
+# def makeMultiChoiceAnswerform(question):
+#     choicesQueryset = Choice.objects.filter(question=question.id)
+#     class multiChoiceAnswerform(forms.Form):
+#         question_text = forms.CharField(widget=forms.TextInput(attrs={'placeholder': question.question_text}),disabled = True, label=False)
+#         choices = forms.ModelChoiceField(queryset=choicesQueryset)
+#     return multiChoiceAnswerform
 
-def questionAnswerView(request,event_id,guest_id):
-    user = request.user
-    event=get_object_or_404(Event,pk = event_id)
-    permission = get_object_or_404(RrgisterEvent,event=event,user=user)
-    if permission.identity == '2':
-        return questionAnswer(request,event_id)
-    else:
-        return questionAnserAll(request,event_id,guest_id,permission.identity)
+# def questionAnswerView(request,event_id,guest_id):
+#     user = request.user
+#     event=get_object_or_404(Event,pk = event_id)
+#     permission = get_object_or_404(RrgisterEvent,event=event,user=user)
+#     if permission.identity == '2':
+#         return questionAnswer(request,event_id)
+#     else:
+#         return questionAnserAll(request,event_id,guest_id,permission.identity)
 
-def questionAnswerAll(request,event_id,guest_id,permission):
-    user=request.user
-    event=get_object_or_404(Event,pk=event_id)
-    guest=get_object_or_404(User,pk=guest_id)
-    guestAccess=get_object_or_404(RegisterEvnet,event=event,user=guest)
-    if guestAccess == '2':
-#        return 
-#    else:
-        return HttpResponse('seems that the guest is not in this event')
+# def questionAnswerAll(request,event_id,guest_id,permission):
+#     user=request.user
+#     event=get_object_or_404(Event,pk=event_id)
+#     guest=get_object_or_404(User,pk=guest_id)
+#     guestAccess=get_object_or_404(RegisterEvnet,event=event,user=guest)
+#     if guestAccess == '2':
+# #        return 
+# #    else:
+#         return HttpResponse('seems that the guest is not in this event')
 
 
 class QuestionWithResponse:
@@ -47,12 +47,6 @@ class QuestionWithResponse:
         self.question = question
         self.choices = choices
         self.response = response
-
-class QuestionResponse:
-    def __init__(self, question, choice, text):
-        self.question = question
-        self.choice = choice
-        self.text = text
 
         
 def questionView(request,event_id,guest_id):
@@ -72,6 +66,23 @@ def questionView(request,event_id,guest_id):
 #     allQuestion = question.objects.filter(event=event,isVisible=True)
 #     for question in allQuestion:
 #         answer = 
+def addAllQuestion(multiChoiceQuestions,textQuestions,registerEvent):
+    questionWithResponses = []
+    for question in multiChoiceQuestions:
+        choices = Choice.objects.filter(question=question)
+        try:
+            response = MultiChoicesResponse.objects.get(question=question, register_event=registerEvent)
+        except ObjectDoesNotExist:
+            pass
+        questionWithResponses.append(QuestionWithResponse(question, choices, response))
+    for question in textQuestions:
+        choices = Choice.objects.filter(question=question)
+        try:
+            response = TextResponse.objects.get(question=question, register_event=registerEvent)
+        except ObjectDoesNotExist:
+            pass
+        questionWithResponses.append(QuestionWithResponse(question, None, response))
+    return questionWithResponses
 
     
 def questionAnswer(request, event_id):
@@ -82,27 +93,7 @@ def questionAnswer(request, event_id):
     registerEvent = get_object_or_404(RegisterEvent, event=event, user=user, identity='2')
     multiChoiceQuestions = Question.objects.filter(event=event, question_type='S')
     textQuestions = Question.objects.filter(event=event, question_type='T')
-   # questionWithResponses = addAllQuestion(multiChoiceQuestion,textQuestion,registerEvent)
-    questionWithResponses = []
-    questionResponses=[]
-    for question in multiChoiceQuestions:
-        choices = Choice.objects.filter(question=question)
-        try:
-            response = MultiChoicesResponse.objects.get(question=question, register_event=registerEvent)
-            #question here???
-            questionResponses.append(QuestionResponse(question,response,None))
-        except ObjectDoesNotExist:
-            pass
-        questionWithResponses.append(QuestionWithResponse(question, choices, None))
-    for question in textQuestions:
-        choices = Choice.objects.filter(question=question)
-        try:
-            response = TextResponse.objects.get(question=question, register_event=registerEvent)
-            questionResponses.append(QuestionResponse(question,None,response))
-        except ObjectDoesNotExist:
-            pass
-        questionWithResponses.append(QuestionWithResponse(question, choices, None))
-        #question here????
+    questionWithResponses = addAllQuestion(multiChoiceQuestions,textQuestions,registerEvent)
     if request.method == 'POST':
         for question in multiChoiceQuestions:
             multiChoicesResponse, created = MultiChoicesResponse.objects.update_or_create(
@@ -132,7 +123,6 @@ def questionAnswer(request, event_id):
         'multiChoiceQuestions':multiChoiceQuestions,
         'textQuestions':textQuestions,
         'questionWithResponses': questionWithResponses,
-        'questionResponses':questionResponses
         })
 
 
@@ -181,32 +171,6 @@ class QuestionStatistics:
         self.choiceCounts = choiceCounts
         self.text_answers = text_answers
 
-# def questionStatistics(request, event_id):
-#     if request.method == 'POST':
-#         toBeChangedQuestion = get_object_or_404(Question, pk=request.POST.get("finalize"))       
-#         toBeChangedQuestion.isEditable = not toBeChangedQuestion.isEditable
-#         toBeChangedQuestion.save()
-#     event = get_object_or_404(Event, pk=event_id)
-#     registerEvent = get_object_or_404(RegisterEvent, user=request.user, event=event)
-#     if registerEvent.identity == '0':
-#         questions = Question.objects.filter(event=event).order_by('id')
-#     else:
-#         questions = Question.objects.filter(event=event, isVisible=True).order_by('id')
-#     questionStatisticses = []
-#     for question in questions:
-#         if question.question_type == 'S':
-#             choices = Choice.objects.filter(question=question)
-#             choiceCounts = []
-#             for choice in choices:
-#                 count = MultiChoicesResponse.objects.filter(answer=choice).count()
-#                 choiceCounts.append(ChoiceCount(choice, count))
-#             questionStatisticses.append(QuestionStatistics(question, choiceCounts, None))
-#         elif question.question_type == 'T':
-#             textAnswers = TextResponse.objects.filter(question=question)
-#             questionStatisticses.append(QuestionStatistics(question, None, textAnswers))
-#     return render(request, 'RSVP/questionStatistics.html', {
-#         'questionStatisticses': questionStatisticses
-#     })
 
 def questionPageCreate(request,event_id):
     user = request.user
@@ -232,12 +196,8 @@ def questionPageEdit(request, event_id, question_id):
     question = get_object_or_404(Question,pk=question_id)
     if isOwner(user,event):
         return questionPageEditOwner(request,question)
-    # elif isVendor(user,event):
-    #     return questionPageEditVendor(request,question)
     return HttpResponse('you have no access to this page')
 
-#def questionPageEditVendor(request,question):
-    
 
 def questionEdit(QuestionForm,question):
     question_text = QuestionForm.cleaned_data['question_text']
