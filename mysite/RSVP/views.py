@@ -99,6 +99,41 @@ def questionAnswer(request, event_id):
         'questionWithResponses': questionWithResponses
         })
 
+
+def isOwner(user,event):
+    permission = get_object_or_404(RegisterEvent,event=event,user=user)
+    if permission.identity == '0':
+        return True
+    return False
+
+def isVendor(user,event):
+    permission = get_object_or_404(RegisterEvent,event=event,user=user)
+    if permission.identity == '1':
+        return True
+    return False
+
+def isGuest(user,event):
+    permission = get_object_or_404(RegisterEvent,event=event,user=user)
+    if permission.identity == '2':
+        return True
+    return False
+    
+def questionCreat(QuestionForm,event):
+    question_text = QuestionForm.cleaned_data['question_text']
+    question_type = QuestionForm.cleaned_data['question_type']
+    isEditable =  QuestionForm.cleaned_data['isEditable']
+    isOptional =  QuestionForm.cleaned_data['isOptional']
+    isVisible = QuestionForm.cleaned_data['isVisible']
+    question = Question(
+        event=event,
+        question_text=question_text,
+        question_type=question_type,
+        isEditable=isEditable,
+        isOptional=isOptional,
+        isVisible=isVisible
+    )
+    question.save()
+            
 class ChoiceCount:
     def __init__(self, choice, count):
         self.choice = choice
@@ -138,77 +173,71 @@ def questionStatistics(request, event_id):
     })
 
 def questionPageCreate(request,event_id):
+    user = request.user
+    event = get_object_or_404(Event,pk = event_id)
+    if not isOwner(user,event):
+        return HttpResponse('you have no access to this page')
     if request.method == 'POST':
         QuestionForm = Questionform(request.POST)
         if QuestionForm.is_valid():
-            question_text = QuestionForm.cleaned_data['question_text']
-            question_type = QuestionForm.cleaned_data['question_type']
-            isEditable =  QuestionForm.cleaned_data['isEditable']
-            isOptional =  QuestionForm.cleaned_data['isOptional']
-            isVisible = QuestionForm.cleaned_data['isVisible']
-            question = Question(
-                event= get_object_or_404(Event,pk = event_id),
-                question_text=question_text,
-                question_type=question_type,
-                isEditable=isEditable,
-                isOptional=isOptional,
-                isVisible=isVisible
-            )
-            question.save()
-            return redirect('..')
-            
+            questionCreat(QuestionForm,event);
+            return redirect('..')            
     else:
         QuestionForm = Questionform()
     return render(request,'RSVP/questionPage.html',{
         'Questionform': QuestionForm,
-        
-    })
-def questionFinalize(request, event_id, question_id):
-    event = get_object_or_404(Event, pk=event_id)
-    registerEvent = get_object_or_404(RegisterEvent, user=request.user, event = event, identity = '1')
-    question = get_object_or_404(Question,pk=question_id, isVisible=True)
-    choices = Choice.objects.filter(question=question)
-    if request.method == 'POST':
-        question.isEditable = not question.isEditable
-        question.save()
-    return render(request,'RSVP/questionFinalize.html',{
-        'question_text':question.question_text,
-        'question_type':question.question_type,
-        'question_isEditable':question.isEditable,
-        'choices':choices,
+        'isCreate':'1'
     })
         
     
 def questionPageEdit(request, event_id, question_id):
     event = get_object_or_404(Event, pk=event_id)
-    registerEvent = get_object_or_404(RegisterEvent, user=request.user, event = event, identity = '0')
+    user = request.user
     question = get_object_or_404(Question,pk=question_id)
+    if isOwner(user,event):
+        return questionPageEditOwner(request,question)
+    # elif isVendor(user,event):
+    #     return questionPageEditVendor(request,question)
+    return HttpResponse('you have no access to this page')
+
+#def questionPageEditVendor(request,question):
+    
+
+def questionEdit(QuestionForm,question):
+    question_text = QuestionForm.cleaned_data['question_text']
+    question_type = QuestionForm.cleaned_data['question_type']
+    isEditable =  QuestionForm.cleaned_data['isEditable']
+    isOptional =  QuestionForm.cleaned_data['isOptional']
+    question.question_text = question_text
+    question.question_type = question_type
+    question.isEditable = isEditable
+    question.isOptional = isOptional
+    question.save()
+
+
+def addChoice(newChoiceForm,question):
+    newChoiceText = newChoiceForm.cleaned_data.get('choice_text')
+    newChoice = Choice(
+        question = question,
+        choice_text = newChoiceText
+    )
+    newChoice.save()
+    
+    
+def questionPageEditOwner(request,question):
     choice = Choice.objects.filter(question=question)
     if request.method == 'POST':
         if request.POST.get('changeQuestion'):
             QuestionForm = Questionform(request.POST)
             if QuestionForm.is_valid():
-                question_text = QuestionForm.cleaned_data['question_text']
-                question_type = QuestionForm.cleaned_data['question_type']
-                isEditable =  QuestionForm.cleaned_data['isEditable']
-                isOptional =  QuestionForm.cleaned_data['isOptional']
-                question = Question.objects.get(pk = question_id)
-                question.question_text = question_text
-                question.question_type = question_type
-                question.isEditable = isEditable
-                question.isOptional = isOptional
-                question.save()
+                questionEdit(QuestionForm,question)             
         elif request.POST.get('add_choice'):
             newChoiceForm = newChoiceform(request.POST)
             if newChoiceForm.is_valid():
-                newChoiceText = newChoiceForm.cleaned_data.get('choice_text')
-                newChoice = Choice(
-                question = question,
-                choice_text = newChoiceText
-                )
-                newChoice.save()
+                addChoice(newChoiceForm,question)
         elif request.POST.get('delete'):
             toBeDeleted = Choice.objects.get(pk=request.POST.get('delete'))
+            #sent email do it later there will be a function to sent email
             mailMessage = 'the choice '+ toBeDeleted.choice_text +' in the question '+ question.question_text
             send_mail(
                 'Is that easy?',
@@ -219,10 +248,8 @@ def questionPageEdit(request, event_id, question_id):
             )
             toBeDeleted.delete()
         elif request.POST.get('deleteQ'):
-            toDeleteQuestion = Question.objects.get(pk=question_id)
-            toDeleteQuestion.delete()
+            question.delete()
             return redirect('../')
-            
     newChoiceForm = newChoiceform()
     QuestionForm = Questionform(instance = question)
     return render(request,'RSVP/questionPage.html',{
@@ -231,25 +258,30 @@ def questionPageEdit(request, event_id, question_id):
         'question':question,
         'choice':choice,
     })
-    
+
+def newEvent(form,creator):
+    event_name = form.cleaned_data['event_name']
+    event_time = form.cleaned_data['event_time']
+    event = Event(event_name=event_name,
+                  event_time=event_time,
+                  creator = creator
+    )
+    event.save()
+    return event
+
 def event_create(request):
+    user = request.user
     if request.method == 'POST':
         form = EventForm(request.POST)
         if form.is_valid():
-            event_name = form.cleaned_data['event_name']
-            event_time = form.cleaned_data['event_time']
-            creator = request.user
-            event = Event(event_name=event_name,
-                          event_time=event_time,
-                          creator = creator
-            )
-            event.save()
+            event = newEvent(form,user)
             register=RegisterEvent(event=event,
-                                   user=request.user,
+                                   user=user,
                                    identity = '0',
                                    register_state ='1' 
             )
             register.save()
+            #may change here later
             if form.cleaned_data['plusOne']:
                 question=Question(event=event,
                                   question_text="will you have anyone come with you?",
@@ -267,7 +299,6 @@ def event_create(request):
             return redirect('../home')
     else:
         form = EventForm()
-    #form.fields['event_name'].widget.attrs['readonly'] = True # disable a form!
     return render(request,'RSVP/event_create.html',{
         'form':form
     })
@@ -292,7 +323,6 @@ def home(request):
     own =  RegisterEvent.objects.filter(user=user,identity=0)
     ownEventsPending = own.filter(register_state = 0)
     ownEvents = own.filter(register_state = 1)
-    # ownHistory = ownEvents.filter(event.event_time < timezone.now)
     guest = RegisterEvent.objects.filter(user=user,identity = 2)
     guestPending = guest.filter(register_state = 0)
     guestEvents = guest.filter(register_state = 1)
@@ -318,15 +348,14 @@ def home(request):
         'vendorEvents':vendorEvents,
         'timeNow':timezone.now()
     })
-    # View code here...
-#n    return render(request, 'RSVP/home.html')
+
+
 def events_list(request,event_id):
     user = request.user
     event = get_object_or_404(Event,pk = event_id)
-    permission = get_object_or_404(RegisterEvent,event=event,user=user)
-    if permission.identity == '0':
+    if isOwner(user,event):
         return events_list_owner(request,event)
-    elif permission.identity == '1':
+    elif isVendor(user,event):
         return events_list_vender(request,event)
     else:
         return HttpResponse('you have on access to this page(will be better)')
@@ -334,15 +363,12 @@ def events_list(request,event_id):
 
 
 def events_list_vender(request, event):
-
     username=request.user.username            
-    questions = Question.objects.filter(event=event)
-
+    questions = Question.objects.filter(event=event,isVisible=True)
     guest = RegisterEvent.objects.filter(event=event,identity=2)
     guestPending = guest.filter(register_state=0)
     guestPass = guest.filter(register_state=1)
     guestNum = guestPass.count()
-
     return render(request, 'RSVP/events_list.html', {
         'event': event,
         'permission':'1',
@@ -422,6 +448,7 @@ def index(request):
     return render( request, template, context )
 #    return render(request, 'RSVP/startbootstrap-landing-page/index.html')
 #    return render(request, 'RSVP/index.html')
+
 def sign_up(request):
     from django import forms
     class NameForm(forms.Form):
@@ -429,6 +456,7 @@ def sign_up(request):
     template = "RSVP/sign_up.html"
     context = { "form" : NameForm() }
     return render( request, template, context )
+
 def signup(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
