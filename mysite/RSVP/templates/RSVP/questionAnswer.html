@@ -38,6 +38,21 @@
 	    <button class="btn btn-primary" text-center" style="width:20%" type="submit">Submit</button>
 	    </div>
 	</form>
+	<hr>
+	<h3>History answer</h3>
+	<ul class="list-group">
+	  {% for questionResponse in questionResponses%}
+	  {% if questionResponse.choice != None%}
+	  <li class="list-group-item list-group-item-primary">{{questionResponse.question.question_text}}: {{questionResponse.choice.answer}}
+	  </li>
+	  {% else%}
+	  <li class="list-group-item list-group-item-primary">{{questionResponse.question.question_text}}: {{questionResponse.text.answer}}
+	  </li>
+	   
+	  {% endif%}
+	  {% endfor%}
+
+	
       </div>
     </div>
   </body>

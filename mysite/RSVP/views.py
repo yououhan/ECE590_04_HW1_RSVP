@@ -47,17 +47,50 @@ class QuestionWithResponse:
         self.question = question
         self.choices = choices
         self.response = response
+
+class QuestionResponse:
+    def __init__(self, question, choice, text):
+        self.question = question
+        self.choice = choice
+        self.text = text
+
+        
+def questionView(request,event_id,guest_id):
+    event = get_object_or_404(Event,pk = event_id)
+    user = request.user
+    guest = get_object_or_404(User,pk = guest_id)
+    if not isGuest(guest,event):
+        return HttpResponse('on such guest in the event')
+    if isVendor(user,event):
+        return vendorView(event,guest)
+    if isOwner(user,event):
+        return ownerView(event,guest)
+    return HttpResponse('no access to this page')
+
+# def vendorView(event,guest):
+#     registerInfo = get_object_or_404(RegisterEvent,event=event,user=guest)
+#     allQuestion = question.objects.filter(event=event,isVisible=True)
+#     for question in allQuestion:
+#         answer = 
+
     
 def questionAnswer(request, event_id):
     event = get_object_or_404(Event, pk=event_id)
-    registerEvent = get_object_or_404(RegisterEvent, event=event, user=request.user, identity='2')
-    multiChoiceQuestions = Question.objects.filter(event=event_id, question_type='S')
-    textQuestions = Question.objects.filter(event=event_id, question_type='T')
+    user = request.user
+    if not isGuest(user,event):
+        return HttpResponse('you have no access to this page')
+    registerEvent = get_object_or_404(RegisterEvent, event=event, user=user, identity='2')
+    multiChoiceQuestions = Question.objects.filter(event=event, question_type='S')
+    textQuestions = Question.objects.filter(event=event, question_type='T')
+   # questionWithResponses = addAllQuestion(multiChoiceQuestion,textQuestion,registerEvent)
     questionWithResponses = []
+    questionResponses=[]
     for question in multiChoiceQuestions:
         choices = Choice.objects.filter(question=question)
         try:
             response = MultiChoicesResponse.objects.get(question=question, register_event=registerEvent)
+            #question here???
+            questionResponses.append(QuestionResponse(question,response,None))
         except ObjectDoesNotExist:
             pass
         questionWithResponses.append(QuestionWithResponse(question, choices, None))
@@ -65,9 +98,11 @@ def questionAnswer(request, event_id):
         choices = Choice.objects.filter(question=question)
         try:
             response = TextResponse.objects.get(question=question, register_event=registerEvent)
+            questionResponses.append(QuestionResponse(question,None,response))
         except ObjectDoesNotExist:
             pass
         questionWithResponses.append(QuestionWithResponse(question, choices, None))
+        #question here????
     if request.method == 'POST':
         for question in multiChoiceQuestions:
             multiChoicesResponse, created = MultiChoicesResponse.objects.update_or_create(
@@ -96,7 +131,8 @@ def questionAnswer(request, event_id):
         'choices':choices,
         'multiChoiceQuestions':multiChoiceQuestions,
         'textQuestions':textQuestions,
-        'questionWithResponses': questionWithResponses
+        'questionWithResponses': questionWithResponses,
+        'questionResponses':questionResponses
         })
 
 
