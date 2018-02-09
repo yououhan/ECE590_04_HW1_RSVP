@@ -1,0 +1,17 @@
+<form action="" method="post">
+  {%csrf_token%}
+  {% for questionStatistics in questionStatisticses %}
+  {{questionStatistics.question.question_text}}
+  isEditable = {{questionStatistics.question.isEditable}}
+  <button class="btn btn-danger" style="width:10%" type="submit" name="finalize" value="{{questionStatistics.question.id}}">Toggle Finalization State</button>
+  {% if questionStatistics.question.question_type == 'S' %}
+  {% for choiceCount in  questionStatistics.choiceCounts %}
+  <p>{{choiceCount.choice}} Total Count:{{choiceCount.count}}</p>
+  {% endfor %}
+  {% elif questionStatistics.question.question_type == 'T' %}
+  {% for text_answer in questionStatistics.text_answers %}
+  <p>{{text_answer.answer}}</p>
+  {% endfor %}
+  {% endif %}
+  {% endfor %}
+</form>
