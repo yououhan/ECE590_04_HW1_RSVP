@@ -14,7 +14,7 @@ MULTICHOICES_RESPONSE_MAX_LENGTH = 30
 TEXT_RESPONSE_MAX_LENGTH = 500
 QUESTION_TYPES_CHOICES = (
     ('S', 'Single select'),
-    ('M', 'Multiple select'),
+#    ('M', 'Multiple select'),
     ('T', 'Text')
 )
 IDENTITY_CHOICES = (

@@ -199,7 +199,7 @@ def isGuest(user,event):
         return True
     return False
     
-def questionCreat(QuestionForm,event):
+def questionCreate(QuestionForm,event):
     question_text = QuestionForm.cleaned_data['question_text']
     question_type = QuestionForm.cleaned_data['question_type']
     isEditable =  QuestionForm.cleaned_data['isEditable']
@@ -214,6 +214,7 @@ def questionCreat(QuestionForm,event):
         isVisible=isVisible
     )
     question.save()
+    return question
             
 class ChoiceCount:
     def __init__(self, choice, count):
@@ -235,8 +236,8 @@ def questionPageCreate(request,event_id):
     if request.method == 'POST':
         QuestionForm = Questionform(request.POST)
         if QuestionForm.is_valid():
-            questionCreat(QuestionForm,event);
-            return redirect('..')            
+            question = questionCreate(QuestionForm,event)
+            return redirect('./' + str(question.id))
     else:
         QuestionForm = Questionform()
     return render(request,'RSVP/questionPage.html',{
@@ -300,7 +301,7 @@ def questionPageEditOwner(request,question):
             toBeDeleted.delete()
         elif request.POST.get('deleteQ'):
             question.delete()
-            return redirect('../')
+            return redirect('../../')
     newChoiceForm = newChoiceform()
     QuestionForm = Questionform(instance = question)
     return render(request,'RSVP/questionPage.html',{
