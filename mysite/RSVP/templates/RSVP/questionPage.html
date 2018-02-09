@@ -60,15 +60,16 @@
 	    {{field}}
 	  </div>
 	  {% endfor %}
-	  <!-- {{ formset.management_form }} -->
-          <!-- {% for form in formset %} -->
-	  <!-- {{ form }} -->
-	  <!-- {% endfor %} -->
-	  <button class="btn btn-primary" style="width:100%" name="changeQuestion" type="submit
-" value="changeQuestion">change Question</button>
+	  {% if isCreate != '1'%}
+	  <button class="btn btn-primary" style="width:100%" name="changeQuestion" type="submit" value="changeQuestion">change Question</button>
+	  {% endif%}
+	  {% if isCreate == '1'%}
+	  <button class="btn btn-primary" style="width:100%" name="changeQuestion" type="submit" value="changeQuestion">add Question</button>
+	  {% endif%}
 	</form>
       </div>
       
+      {% if isCreate != '1'%}
       <form action="" method="post">
 	{%csrf_token%}
 	<div>
@@ -77,9 +78,7 @@
 	  </p>
 	</div>
       </form>
-
-
-      
+   
       <h2>Choices</h2>
       <form method="post" action="">
 	{%csrf_token%}
@@ -115,7 +114,9 @@
 	  <button class="btn btn-primary" style="width:100%" name="add_choice" type="submit" value="add_choice">add choice</button>
 	</form>
       </div>
-	</div>
-      </div>      
+    </div>
+{% endif%}    
+</div>
+
     </div>
 
