@@ -1,23 +1,28 @@
 <form method="post" action="">
   {%csrf_token%}
-  {% for question in multiChoiceQuestions%}
-  
-  {{question.question_text}}
-  {% for choice in choices %}
-  {% if choice.question_id == question.id %}
+  {% for questionWithResponse in questionWithResponses%}
+  {{ questionWithResponse.question.question_text}}
+  {% if questionWithResponse.choices.count > 0 %}
+  {% for choice in questionWithResponse.choices%}
   <div class="custom-control custom-radio">
-    <input type="radio" name="{{question.id}}" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
+    {% if choice.id == questionWithResponse.response.answer.id %}    
+    <input type="radio" name="{{questionWithResponse.question.id}}" checked="checked" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
+    {% else %}
+    <input type="radio" name="{{questionWithResponse.question.id}}" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
+    {% endif %}
     <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br>
   </div>
+  {% endfor %}
+  {% else %}
+  <div>
+    <input class="form-control form-control-lg" type="text" placeholder="{{questionWithResponse.response.answer}}" name="{{questionWithResponse.question.id}}">
+  </div>  
   {% endif %}
   {% endfor %}
-  {% endfor %}
   {% for question in textQuestions%}
-  <div>
-    <p>{{question.question_text}}</p>
-    <input class="form-control form-control-lg" type="text" placeholder=".form-control-lg" name="{{question.id}}">
-    {% endfor  %}
-  </div>
+  {% endfor  %}
+  {% for textResponse in textResonses%}
+  {{textResponse}}
+  {% endfor  %}
   <button class="btn btn-danger" style="width:20%" type="submit">Submit</button>
-  {{TestResponseFormSet}}
 </form>
