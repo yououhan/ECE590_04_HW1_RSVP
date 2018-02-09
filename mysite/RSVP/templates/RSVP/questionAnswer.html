@@ -6,9 +6,18 @@
   </head>
   <body>
     <div class="container">
-      <h1>Please answer the following questions</h1>
-      <div style="width:100%">
-	<form method="post" action="">
+      <form method="post" action="">
+	<h1>Please answer the following questions</h1>
+	{% if event.plus_one_permissible %}
+	<div class="text-center" style="margin-bottom:20px">
+	  {% if showPlusOneQuestions %}
+	  <button class="btn btn-success" style="width:30%" type="submit" name="toggleAPlusOne" value="setFalse">Cancel a Plus One</button>
+	  {% else %}
+	  <button class="btn btn-success" style="width:30%" type="submit" name="toggleAPlusOne" value="setTrue">Bring a Plus One</button>
+	  {% endif %}
+	</div>
+	{% endif %}
+	<div style="width:100%">
 	  {%csrf_token%}
 	  <ul class="list-group">
 	    {% for questionWithResponse in questionWithResponses%}
@@ -30,10 +39,11 @@
 	      </ul>
 	    </div>
 	    {% else %}
-	    <textarea class="form-control" rows="3" "type="text" placeholder="{{questionWithResponse.response.answer}}" name="{{questionWithResponse.question.id}}"></textarea>
-	      {% endif %}
-	      {% endfor %}
+	    <textarea class="form-control" rows="3" name="{{questionWithResponse.question.id}}">{{questionWithResponse.response.answer}}</textarea>
+	    {% endif %}
+	    {% endfor %}
 	  </ul>
+<<<<<<< HEAD
 	  <!-- {% if noSubmit != True%} -->
 	  <div class="text-center" style="margin-top:30px">
 	    <button class="btn btn-primary" text-center" style="width:20%" type="submit">Submit</button>
@@ -43,6 +53,42 @@
 
 	
       </div>
+=======
+	</div>
+	{% if showPlusOneQuestions%}
+	<h1>Please answer questions for your plus one</h1>
+	<div style="width:100%">
+	  <ul class="list-group">
+	    {% for questionWithPlusOneResponse in questionWithPlusOneResponses%}
+	    <li class="list-group-item list-group-item-primary">Question: {{questionWithPlusOneResponse.question.question_text}}
+	    </li>
+	    {% if questionWithPlusOneResponse.choices.count > 0 %}
+	    <div class="custom-control custom-radio container-fluid">
+	      <ul class="list-group list-group-flush">
+		{% for choice in questionWithPlusOneResponse.choices%}
+		<li class="list-group-item">
+		  {% if choice.id == questionWithPlusOneResponse.response.answer.id %}    
+		  <input type="radio" name="plus_one_{{questionWithPlusOneResponse.question.id}}" checked="checked" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
+		  {% else %}
+		  <input type="radio" name="plus_one_{{questionWithPlusOneResponse.question.id}}" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
+		  {% endif %}
+		  <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br>
+		</li>
+		{% endfor %}
+	      </ul>
+	    </div>
+	    {% else %}
+	    <textarea class="form-control" rows="3" name="plus_one_{{questionWithPlusOneResponse.question.id}}">{{questionWithPlusOneResponse.response.answer}}</textarea>
+	    {% endif %}
+	    {% endfor %}
+	  </ul>
+	  {% endif %}
+	  <div class="text-center" style="margin-top:30px">
+	    <button class="btn btn-primary" style="width:20%" type="submit">Submit</button>
+	  </div>	  
+	</div>
+      </form>
+>>>>>>> b9a868be771005fb25329faec44d2c8b92ba0279
     </div>
   </body>
 </html>

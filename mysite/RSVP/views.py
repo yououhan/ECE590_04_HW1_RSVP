@@ -69,7 +69,9 @@ def viewAnswer(request,event,guest,ownership):
         question = Question.objects.filter(event=event,isVisible=True)
     multiChoiceQuestions = question.filter(event=event, question_type='S')
     textQuestions = question.filter(event=event, question_type='T')
-    questionWithResponses = addAllQuestion(multiChoiceQuestions,textQuestions,registerEvent)
+    questionWithPlusOneResponses = addAllQuestion(multiChoiceQuestions,textQuestions,registerEvent, True)
+    questionWithResponses = addAllQuestion(multiChoiceQuestions,textQuestions,registerEvent, False)
+    showPlusOneQuestions = True
     questionIds = Question.objects.values_list('id').filter(event=event, question_type='S')
     choices = Choice.objects.filter(question__in=questionIds)
     return render(request,'RSVP/questionAnswer.html',{
@@ -77,27 +79,58 @@ def viewAnswer(request,event,guest,ownership):
         'multiChoiceQuestions':multiChoiceQuestions,
         'textQuestions':textQuestions,
         'questionWithResponses': questionWithResponses,
-        'noSubmit':True
+        'noSubmit':True,
+        'showPlusOneQuestions': showPlusOneQuestions,
+        'multiChoiceQuestions':multiChoiceQuestions,
+        'questionWithPlusOneResponses': questionWithPlusOneResponses
     })
     
-def addAllQuestion(multiChoiceQuestions,textQuestions,registerEvent):
+def addAllQuestion(multiChoiceQuestions,textQuestions,registerEvent, isPlusOne):
     questionWithResponses = []
     for question in multiChoiceQuestions:
         choices = Choice.objects.filter(question=question)
         try:
-            response = MultiChoicesResponse.objects.get(question=question, register_event=registerEvent)
+            response = MultiChoicesResponse.objects.get(question=question, register_event=registerEvent, is_plus_one=isPlusOne)
         except ObjectDoesNotExist:
             response = None
         questionWithResponses.append(QuestionWithResponse(question, choices, response))
     for question in textQuestions:
         choices = Choice.objects.filter(question=question)
         try:
-            response = TextResponse.objects.get(question=question, register_event=registerEvent)
+            response = TextResponse.objects.get(question=question, register_event=registerEvent, is_plus_one=isPlusOne)
         except ObjectDoesNotExist:
             response = None
         questionWithResponses.append(QuestionWithResponse(question, None, response))
     return questionWithResponses
 
+def saveResponses(requestPost, multiChoiceQuestions, textQuestions, registerEvent, isPlusOne):
+    for question in multiChoiceQuestions:
+        if isPlusOne:
+            choice_selected=requestPost.get(str(question.id))
+            choice_selected=requestPost.get('plus_one_' + str(question.id))
+        else:
+            choice_selected=requestPost.get(str(question.id))
+        multiChoicesResponse, created = MultiChoicesResponse.objects.update_or_create(
+            question=question,
+            register_event=registerEvent,
+            defaults={
+                'answer': Choice.objects.get(pk=choice_selected),
+                'last_updated_time': timezone.now(),
+                'is_plus_one': isPlusOne,
+            }
+        )
+        multiChoicesResponse.save()
+    for question in textQuestions:
+        textResponse, created = TextResponse.objects.update_or_create(
+            question=question,
+            register_event=registerEvent,
+            defaults={
+                'answer': requestPost.get(str(question.id)),
+                'last_updated_time': timezone.now(),
+                'is_plus_one': isPlusOne,
+            }
+        )
+        textResponse.save()
     
 def questionAnswer(request, event_id):
     event = get_object_or_404(Event, pk=event_id)
@@ -107,36 +140,30 @@ def questionAnswer(request, event_id):
     registerEvent = get_object_or_404(RegisterEvent, event=event, user=user, identity='2')
     multiChoiceQuestions = Question.objects.filter(event=event, question_type='S')
     textQuestions = Question.objects.filter(event=event, question_type='T')
-    questionWithResponses = addAllQuestion(multiChoiceQuestions,textQuestions,registerEvent)
+    questionWithPlusOneResponses = addAllQuestion(multiChoiceQuestions,textQuestions,registerEvent, True)
+    questionWithResponses = addAllQuestion(multiChoiceQuestions,textQuestions,registerEvent, False)
+    showPlusOneQuestions = False
     if request.method == 'POST':
-        for question in multiChoiceQuestions:
-            multiChoicesResponse, created = MultiChoicesResponse.objects.update_or_create(
-                question=question,
-                register_event=registerEvent,
-                defaults={
-                    'answer': Choice.objects.get(pk=request.POST.get(str(question.id))),
-                    'last_updated_time': timezone.now()
-                }
-            )
-            multiChoicesResponse.save()
-        for question in textQuestions:
-            textResponse, created = TextResponse.objects.update_or_create(
-                question=question,
-                register_event=registerEvent,
-                defaults={
-                    'answer': request.POST.get(str(question.id)),
-                    'last_updated_time': timezone.now()
-                }
-            )
-            textResponse.save()
-        return redirect('../../../home')
-    questionIds = Question.objects.values_list('id').filter(event=event, question_type='S')
+        if request.POST.get('toggleAPlusOne'):
+            if request.POST.get('toggleAPlusOne') == "setTrue":
+                showPlusOneQuestions = True
+            else:
+                showPlusOneQuestions = False
+                #delete all the response by the guest
+        else:
+            saveResponses(request.POST, multiChoiceQuestions, textQuestions, registerEvent, True)
+            saveResponses(request.POST, multiChoiceQuestions, textQuestions, registerEvent, False)    
+            return redirect('../../../home')
+    questionIds = Question.objects.values_list('id').filter(event=event_id, question_type='S')
     choices = Choice.objects.filter(question__in=questionIds)
     return render(request, 'RSVP/questionAnswer.html',{
         'choices':choices,
+        'event': event,
+        'showPlusOneQuestions': showPlusOneQuestions,
         'multiChoiceQuestions':multiChoiceQuestions,
         'textQuestions':textQuestions,
         'questionWithResponses': questionWithResponses,
+        'questionWithPlusOneResponses': questionWithPlusOneResponses,
         })
 
 
