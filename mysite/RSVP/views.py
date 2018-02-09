@@ -54,18 +54,32 @@ def questionView(request,event_id,guest_id):
     user = request.user
     guest = get_object_or_404(User,pk = guest_id)
     if not isGuest(guest,event):
-        return HttpResponse('on such guest in the event')
+        return HttpResponse('no such guest in the event')
     if isVendor(user,event):
-        return vendorView(event,guest)
+        return viewAnswer(request,event,guest,False)
     if isOwner(user,event):
-        return ownerView(event,guest)
+        return viewAnswer(request,event,guest,True)
     return HttpResponse('no access to this page')
 
-# def vendorView(event,guest):
-#     registerInfo = get_object_or_404(RegisterEvent,event=event,user=guest)
-#     allQuestion = question.objects.filter(event=event,isVisible=True)
-#     for question in allQuestion:
-#         answer = 
+def viewAnswer(request,event,guest,ownership):
+    registerEvent = get_object_or_404(RegisterEvent,event=event,user=guest)
+    if ownership:
+        question = Question.objects.filter(event=event)
+    else:
+        question = Question.objects.filter(event=event,isVisible=True)
+    multiChoiceQuestions = question.filter(event=event, question_type='S')
+    textQuestions = question.filter(event=event, question_type='T')
+    questionWithResponses = addAllQuestion(multiChoiceQuestions,textQuestions,registerEvent)
+    questionIds = Question.objects.values_list('id').filter(event=event, question_type='S')
+    choices = Choice.objects.filter(question__in=questionIds)
+    return render(request,'RSVP/questionAnswer.html',{
+        'choices':choices,
+        'multiChoiceQuestions':multiChoiceQuestions,
+        'textQuestions':textQuestions,
+        'questionWithResponses': questionWithResponses,
+        'noSubmit':True
+    })
+    
 def addAllQuestion(multiChoiceQuestions,textQuestions,registerEvent):
     questionWithResponses = []
     for question in multiChoiceQuestions:
@@ -73,14 +87,14 @@ def addAllQuestion(multiChoiceQuestions,textQuestions,registerEvent):
         try:
             response = MultiChoicesResponse.objects.get(question=question, register_event=registerEvent)
         except ObjectDoesNotExist:
-            pass
+            response = None
         questionWithResponses.append(QuestionWithResponse(question, choices, response))
     for question in textQuestions:
         choices = Choice.objects.filter(question=question)
         try:
             response = TextResponse.objects.get(question=question, register_event=registerEvent)
         except ObjectDoesNotExist:
-            pass
+            response = None
         questionWithResponses.append(QuestionWithResponse(question, None, response))
     return questionWithResponses
 
@@ -116,7 +130,7 @@ def questionAnswer(request, event_id):
             )
             textResponse.save()
         return redirect('../../../home')
-    questionIds = Question.objects.values_list('id').filter(event=event_id, question_type='S')
+    questionIds = Question.objects.values_list('id').filter(event=event, question_type='S')
     choices = Choice.objects.filter(question__in=questionIds)
     return render(request, 'RSVP/questionAnswer.html',{
         'choices':choices,
