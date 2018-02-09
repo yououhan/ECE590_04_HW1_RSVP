@@ -44,7 +44,13 @@
 	    {% endfor %}
 	  </ul>
 	</div>
-	{% if showPlusOneQuestions%}
+	<div class="text-center" style="margin-top:30px">
+	  <button class="btn btn-primary" style="width:20%" type="submit" name="submit" value="guest">Submit</button>
+	  </div>
+      </form>
+      {% if showPlusOneQuestions%}
+      <form method="post" action="">
+	{%csrf_token%}
 	<h1>Please answer questions for your plus one</h1>
 	<div style="width:100%">
 	  <ul class="list-group">
@@ -71,10 +77,10 @@
 	    {% endif %}
 	    {% endfor %}
 	  </ul>
-	  {% endif %}
 	  <div class="text-center" style="margin-top:30px">
-	    <button class="btn btn-primary" style="width:20%" type="submit">Submit</button>
+	    <button class="btn btn-primary" style="width:20%" type="submit" name="submit" value="plusOne">Submit</button>
 	  </div>	  
+	  {% endif %}
 	</div>
       </form>
     </div>

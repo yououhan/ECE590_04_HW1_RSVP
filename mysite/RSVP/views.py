@@ -87,13 +87,13 @@ def addAllQuestion(multiChoiceQuestions,textQuestions,registerEvent, isPlusOne):
 def saveResponses(requestPost, multiChoiceQuestions, textQuestions, registerEvent, isPlusOne):
     for question in multiChoiceQuestions:
         if isPlusOne:
-            choice_selected=requestPost.get(str(question.id))
             choice_selected=requestPost.get('plus_one_' + str(question.id))
         else:
             choice_selected=requestPost.get(str(question.id))
         multiChoicesResponse, created = MultiChoicesResponse.objects.update_or_create(
             question=question,
             register_event=registerEvent,
+            is_plus_one=isPlusOne,
             defaults={
                 'answer': Choice.objects.get(pk=choice_selected),
                 'last_updated_time': timezone.now(),
@@ -102,11 +102,16 @@ def saveResponses(requestPost, multiChoiceQuestions, textQuestions, registerEven
         )
         multiChoicesResponse.save()
     for question in textQuestions:
+        if isPlusOne:
+            answer_selected=requestPost.get('plus_one_' + str(question.id))
+        else:
+            answer_selected=requestPost.get(str(question.id))
         textResponse, created = TextResponse.objects.update_or_create(
             question=question,
             register_event=registerEvent,
+            is_plus_one=isPlusOne,
             defaults={
-                'answer': requestPost.get(str(question.id)),
+                'answer': answer_selected,
                 'last_updated_time': timezone.now(),
                 'is_plus_one': isPlusOne,
             }
@@ -123,7 +128,12 @@ def questionAnswer(request, event_id):
     textQuestions = Question.objects.filter(event=event, question_type='T')
     questionWithPlusOneResponses = addAllQuestion(multiChoiceQuestions,textQuestions,registerEvent, True)
     questionWithResponses = addAllQuestion(multiChoiceQuestions,textQuestions,registerEvent, False)
-    showPlusOneQuestions = False
+    multiChoiceResponseCount = MultiChoicesResponse.objects.filter(is_plus_one=True).count()
+    textResponseCount = TextResponse.objects.filter(is_plus_one=True).count()
+    if multiChoiceResponseCount > 0 or textResponseCount > 0:
+        showPlusOneQuestions = True
+    else:
+        showPlusOneQuestions = False
     if request.method == 'POST':
         if request.POST.get('toggleAPlusOne'):
             if request.POST.get('toggleAPlusOne') == "setTrue":
@@ -131,10 +141,14 @@ def questionAnswer(request, event_id):
             else:
                 showPlusOneQuestions = False
                 #delete all the response by the guest
-        else:
-            saveResponses(request.POST, multiChoiceQuestions, textQuestions, registerEvent, True)
-            saveResponses(request.POST, multiChoiceQuestions, textQuestions, registerEvent, False)    
-            return redirect('../../../home')
+                MultiChoicesResponse.objects.filter(register_event=registerEvent, is_plus_one=True).delete()
+                TextResponse.objects.filter(register_event=registerEvent, is_plus_one=True).delete()
+        elif request.POST.get('submit'):
+            if request.POST.get('submit') == 'guest':
+                saveResponses(request.POST, multiChoiceQuestions, textQuestions, registerEvent, False)
+            elif request.POST.get('submit') == 'plusOne':
+                saveResponses(request.POST, multiChoiceQuestions, textQuestions, registerEvent, True)
+            return redirect('./')
     questionIds = Question.objects.values_list('id').filter(event=event_id, question_type='S')
     choices = Choice.objects.filter(question__in=questionIds)
     return render(request, 'RSVP/questionAnswer.html',{
