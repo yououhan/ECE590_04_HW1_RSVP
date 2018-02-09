@@ -145,32 +145,32 @@ class QuestionStatistics:
         self.choiceCounts = choiceCounts
         self.text_answers = text_answers
 
-def questionStatistics(request, event_id):
-    if request.method == 'POST':
-        toBeChangedQuestion = get_object_or_404(Question, pk=request.POST.get("finalize"))       
-        toBeChangedQuestion.isEditable = not toBeChangedQuestion.isEditable
-        toBeChangedQuestion.save()
-    event = get_object_or_404(Event, pk=event_id)
-    registerEvent = get_object_or_404(RegisterEvent, user=request.user, event=event)
-    if registerEvent.identity == '0':
-        questions = Question.objects.filter(event=event).order_by('id')
-    else:
-        questions = Question.objects.filter(event=event, isVisible=True).order_by('id')
-    questionStatisticses = []
-    for question in questions:
-        if question.question_type == 'S':
-            choices = Choice.objects.filter(question=question)
-            choiceCounts = []
-            for choice in choices:
-                count = MultiChoicesResponse.objects.filter(answer=choice).count()
-                choiceCounts.append(ChoiceCount(choice, count))
-            questionStatisticses.append(QuestionStatistics(question, choiceCounts, None))
-        elif question.question_type == 'T':
-            textAnswers = TextResponse.objects.filter(question=question)
-            questionStatisticses.append(QuestionStatistics(question, None, textAnswers))
-    return render(request, 'RSVP/questionStatistics.html', {
-        'questionStatisticses': questionStatisticses
-    })
+# def questionStatistics(request, event_id):
+#     if request.method == 'POST':
+#         toBeChangedQuestion = get_object_or_404(Question, pk=request.POST.get("finalize"))       
+#         toBeChangedQuestion.isEditable = not toBeChangedQuestion.isEditable
+#         toBeChangedQuestion.save()
+#     event = get_object_or_404(Event, pk=event_id)
+#     registerEvent = get_object_or_404(RegisterEvent, user=request.user, event=event)
+#     if registerEvent.identity == '0':
+#         questions = Question.objects.filter(event=event).order_by('id')
+#     else:
+#         questions = Question.objects.filter(event=event, isVisible=True).order_by('id')
+#     questionStatisticses = []
+#     for question in questions:
+#         if question.question_type == 'S':
+#             choices = Choice.objects.filter(question=question)
+#             choiceCounts = []
+#             for choice in choices:
+#                 count = MultiChoicesResponse.objects.filter(answer=choice).count()
+#                 choiceCounts.append(ChoiceCount(choice, count))
+#             questionStatisticses.append(QuestionStatistics(question, choiceCounts, None))
+#         elif question.question_type == 'T':
+#             textAnswers = TextResponse.objects.filter(question=question)
+#             questionStatisticses.append(QuestionStatistics(question, None, textAnswers))
+#     return render(request, 'RSVP/questionStatistics.html', {
+#         'questionStatisticses': questionStatisticses
+#     })
 
 def questionPageCreate(request,event_id):
     user = request.user
@@ -360,15 +360,34 @@ def events_list(request,event_id):
     else:
         return HttpResponse('you have on access to this page(will be better)')
 
+def countStatistics(questions):
+    questionStatisticses = []
+    for question in questions:
+        if question.question_type == 'S':
+            choices = Choice.objects.filter(question=question)
+            choiceCounts = []
+            for choice in choices:
+                count = MultiChoicesResponse.objects.filter(answer=choice).count()
+                choiceCounts.append(ChoiceCount(choice, count))
+            questionStatisticses.append(QuestionStatistics(question, choiceCounts, None))
+        elif question.question_type == 'T':
+            textAnswers = TextResponse.objects.filter(question=question)
+            questionStatisticses.append(QuestionStatistics(question, None, textAnswers))
+    return questionStatisticses
 
 
 def events_list_vender(request, event):
+    if request.method == 'POST':
+        toBeChangedQuestion = get_object_or_404(Question, pk=request.POST.get("finalize"))       
+        toBeChangedQuestion.isEditable = not toBeChangedQuestion.isEditable
+        toBeChangedQuestion.save()
     username=request.user.username            
-    questions = Question.objects.filter(event=event,isVisible=True)
+    questions = Question.objects.filter(event=event,isVisible=True).order_by('id')
     guest = RegisterEvent.objects.filter(event=event,identity=2)
     guestPending = guest.filter(register_state=0)
     guestPass = guest.filter(register_state=1)
     guestNum = guestPass.count()
+    questionStatisticses = countStatistics(questions)
     return render(request, 'RSVP/events_list.html', {
         'event': event,
         'permission':'1',
@@ -379,6 +398,7 @@ def events_list_vender(request, event):
         'questions':questions,
         'timeNow':timezone.now(),
         'username':username,
+        'questionStatisticses': questionStatisticses
     })
 
 
