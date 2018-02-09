@@ -149,14 +149,14 @@ def isGuest(user,event):
         return True
     return False
     
-def questionCreat(QuestionForm):
+def questionCreat(QuestionForm,event):
     question_text = QuestionForm.cleaned_data['question_text']
     question_type = QuestionForm.cleaned_data['question_type']
     isEditable =  QuestionForm.cleaned_data['isEditable']
     isOptional =  QuestionForm.cleaned_data['isOptional']
     isVisible = QuestionForm.cleaned_data['isVisible']
     question = Question(
-        event= get_object_or_404(Event,pk = event_id),
+        event=event,
         question_text=question_text,
         question_type=question_type,
         isEditable=isEditable,
@@ -174,7 +174,7 @@ def questionPageCreate(request,event_id):
     if request.method == 'POST':
         QuestionForm = Questionform(request.POST)
         if QuestionForm.is_valid():
-            questionCreat(QuestionForm);
+            questionCreat(QuestionForm,event);
             return redirect('..')            
     else:
         QuestionForm = Questionform()
