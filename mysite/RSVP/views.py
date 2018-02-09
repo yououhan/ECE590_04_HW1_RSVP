@@ -190,11 +190,11 @@ def questionPageEdit(request, event_id, question_id):
     question = get_object_or_404(Question,pk=question_id)
     if isOwner(user,event):
         return questionPageEditOwner(request,question)
-    elif isVendor(user,event):
-        return questionPageEditVendor(request,question)
+    # elif isVendor(user,event):
+    #     return questionPageEditVendor(request,question)
     return HttpResponse('you have no access to this page')
 
-def questionPageEditVendor(request,question):
+#def questionPageEditVendor(request,question):
     
 
 def questionEdit(QuestionForm,question):
