@@ -21,7 +21,7 @@ urlpatterns = [
     # for question edit and add choive, only access to owner 
     path('event/<int:event_id>/questionView/<int:guest_id>',views.questionAnswer,name='questionAnswer'),
     # access to owner and vender, but vender can only view limit question
-    path('event/<int:event_id>/questionStatistics/',views.questionStatistics,name='questionStatistics'),
+#    path('event/<int:event_id>/questionStatistics/',views.questionStatistics,name='questionStatistics'),
     # for vender use will mergo the the event/<int:event_id> page soon
     path('event/<int:event_id>/questionAnswer/',views.questionAnswer,name='questionAnswer'),
     # for guest to answer question only access to guest
