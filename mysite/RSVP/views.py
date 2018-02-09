@@ -68,10 +68,6 @@ def questionAnswer(request, event_id):
         except ObjectDoesNotExist:
             pass
         questionWithResponses.append(QuestionWithResponse(question, choices, None))
-        #return HttpResponse(response.first().answer)
- #   questionWithResponse.response = '111111'
-    #multiChoicesResponses = MultiChoicesResponse.objects.filter(question=question, register_event=registerEvent)
-    #textResponses = TextResponse.objects.filter(question=question, register_event=registerEvent)
     if request.method == 'POST':
         for question in multiChoiceQuestions:
             multiChoicesResponse, created = MultiChoicesResponse.objects.update_or_create(
@@ -82,12 +78,6 @@ def questionAnswer(request, event_id):
                     'last_updated_time': timezone.now()
                 }
             )
-            # multiChoicesResponse = MultiChoicesResponse(
-            #     question = question,
-            #     register_event=registerEvent,
-            #     answer = Choice.objects.get(pk=request.POST.get(str(question.id))),
-            #     last_updated_time = timezone.now()
-            # )
             multiChoicesResponse.save()
         for question in textQuestions:
             textResponse, created = TextResponse.objects.update_or_create(
@@ -98,37 +88,54 @@ def questionAnswer(request, event_id):
                     'last_updated_time': timezone.now()
                 }
             )
-            # textResponse = TextResponse(
-            #     question = question,
-            #     register_event = registerEvent,
-            #     answer = request.POST.get(str(question.id)),
-            #     last_updated_time = timezone.now()
-            # )
             textResponse.save()
         return redirect('../../../home')
     questionIds = Question.objects.values_list('id').filter(event=event_id, question_type='S')
-#    questionIds = Question.objects.values_list('id').filter(event=event_id, question_type='S')
-#    question = multiChoiceQuestions.first()
-#    MultiChoiceAnswerFormset = formset_factory(MultiChoiceAnswerform)
-#    for question in multiChoiceQuestions:
     choices = Choice.objects.filter(question__in=questionIds)
-#    textResponseFS = textResponseFormSet(instance=event)
-#    return HttpResponse(textResponseFS)
-    #formset = QuestionFormSet(instance=question)
-#    multiChoiceAnswerForm = makeMultiChoiceAnswerform(question)
-#        addToFormset(multiChoiceAnswerForm)
     return render(request, 'RSVP/questionAnswer.html',{
         'choices':choices,
         'multiChoiceQuestions':multiChoiceQuestions,
- #       'multiChoiceReponses':multiChoiceResponses,
         'textQuestions':textQuestions,
-#        'textResponses':textResponses,
         'questionWithResponses': questionWithResponses
-#        'textResponseFormSet':textResponseFS,
-#        'multiChoiceQuestions':multiChoiceQuestions,
-#        'multiChoiceAnswerform':formset,#multiChoiceAnswerForm,
- #       'multiChoiceAnswerformset':multiChoiceAnswerFormset,
         })
+
+class ChoiceCount:
+    def __init__(self, choice, count):
+        self.choice = choice
+        self.count = count
+        
+class QuestionStatistics:
+    def __init__(self, question, choiceCounts, text_answers):
+        self.question = question
+        self.choiceCounts = choiceCounts
+        self.text_answers = text_answers
+
+def questionStatistics(request, event_id):
+    if request.method == 'POST':
+        toBeChangedQuestion = get_object_or_404(Question, pk=request.POST.get("finalize"))       
+        toBeChangedQuestion.isEditable = not toBeChangedQuestion.isEditable
+        toBeChangedQuestion.save()
+    event = get_object_or_404(Event, pk=event_id)
+    registerEvent = get_object_or_404(RegisterEvent, user=request.user, event=event)
+    if registerEvent.identity == '0':
+        questions = Question.objects.filter(event=event).order_by('id')
+    else:
+        questions = Question.objects.filter(event=event, isVisible=True).order_by('id')
+    questionStatisticses = []
+    for question in questions:
+        if question.question_type == 'S':
+            choices = Choice.objects.filter(question=question)
+            choiceCounts = []
+            for choice in choices:
+                count = MultiChoicesResponse.objects.filter(answer=choice).count()
+                choiceCounts.append(ChoiceCount(choice, count))
+            questionStatisticses.append(QuestionStatistics(question, choiceCounts, None))
+        elif question.question_type == 'T':
+            textAnswers = TextResponse.objects.filter(question=question)
+            questionStatisticses.append(QuestionStatistics(question, None, textAnswers))
+    return render(request, 'RSVP/questionStatistics.html', {
+        'questionStatisticses': questionStatisticses
+    })
 
 def questionPageCreate(request,event_id):
     if request.method == 'POST':
