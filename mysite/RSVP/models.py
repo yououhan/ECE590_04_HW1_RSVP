@@ -47,6 +47,7 @@ class Event(models.Model):
     )
     event_time = models.DateTimeField('event held time', default = timezone.now)
     create_time = models.DateTimeField('time created', auto_now_add = True)
+    plus_one_permissible = models.BooleanField()
     last_updated_time = models.DateTimeField('last updated time', auto_now = True)
     def __str__(self):
         return self.event_name
@@ -112,13 +113,14 @@ class MultiChoicesResponse(models.Model):
         null = True
         )
     class Meta:
-        unique_together = (("question", "register_event"),)
+        unique_together = (("question", "register_event", "is_plus_one"),)
     #answer = models.CharField(max_length = MULTICHOICES_RESPONSE_MAX_LENGTH)
     answer = models.ForeignKey(
         Choice,
         on_delete=models.CASCADE
         )
     last_updated_time = models.DateTimeField('last updated time')
+    is_plus_one = models.BooleanField()
     def __str__(self):
         return '%s reponsed to %s' % (self.register_event.user, self.question.question_text)
     
@@ -134,9 +136,10 @@ class TextResponse(models.Model):
         limit_choices_to = {'identity' :'2'},
         )
     class Meta:
-        unique_together = (("question", "register_event"),)
+        unique_together = (("question", "register_event", "is_plus_one"),)
     answer = models.TextField(max_length = TEXT_RESPONSE_MAX_LENGTH)
     last_updated_time = models.DateTimeField('last updated time')
+    is_plus_one = models.BooleanField()
     def __str__(self):
         return '%s reponsed to %s' % (self.register_event.user, self.question.question_text)
 

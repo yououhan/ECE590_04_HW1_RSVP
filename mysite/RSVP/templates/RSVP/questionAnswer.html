@@ -7,6 +7,7 @@
   <body>
     <div class="container">
       <h1>Please answer the following questions</h1>
+      <button class="btn btn-primary" style="width:20%" type="submit">Bring a Plus One</button>
       <div style="width:100%">
 	<form method="post" action="">
 	  {%csrf_token%}
@@ -30,12 +31,12 @@
 	      </ul>
 	    </div>
 	    {% else %}
-	    <textarea class="form-control" rows="3" "type="text" placeholder="{{questionWithResponse.response.answer}}" name="{{questionWithResponse.question.id}}"></textarea>
+	    <textarea class="form-control" rows="3" name="{{questionWithResponse.question.id}}">{{questionWithResponse.response.answer}}</textarea>
 	      {% endif %}
 	      {% endfor %}
 	  </ul>
 	  <div class="text-center" style="margin-top:30px">
-	    <button class="btn btn-primary" text-center" style="width:20%" type="submit">Submit</button>
+	    <button class="btn btn-primary" style="width:20%" type="submit">Submit</button>
 	    </div>
 	</form>
       </div>
