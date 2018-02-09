@@ -60,14 +60,14 @@ def questionAnswer(request, event_id):
             response = MultiChoicesResponse.objects.get(question=question, register_event=registerEvent)
         except ObjectDoesNotExist:
             pass
-        questionWithResponses.append(QuestionWithResponse(question, choices, None))
+        questionWithResponses.append(QuestionWithResponse(question, choices, response))
     for question in textQuestions:
         choices = Choice.objects.filter(question=question)
         try:
             response = TextResponse.objects.get(question=question, register_event=registerEvent)
         except ObjectDoesNotExist:
             pass
-        questionWithResponses.append(QuestionWithResponse(question, choices, None))
+        questionWithResponses.append(QuestionWithResponse(question, None, response))
     if request.method == 'POST':
         for question in multiChoiceQuestions:
             multiChoicesResponse, created = MultiChoicesResponse.objects.update_or_create(
