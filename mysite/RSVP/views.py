@@ -541,6 +541,7 @@ def signup(request):
 
 def test(request):
     return HttpResponse("Hello, world. You're " + request.user.username)
-def logout(request):
+from django.contrib.auth import logout
+def logout_view(request):
     logout(request)
-    return redirect('../login')
+    return redirect('/RSVP')

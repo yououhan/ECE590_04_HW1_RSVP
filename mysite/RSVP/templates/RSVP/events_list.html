@@ -222,23 +222,60 @@
 	  {% if permission == '1'%}
 	  <hr>
 	  <h2>statistic</h2>
-	  <form action="" method="post">
-	    {%csrf_token%}
+  <!-- 	  <form action="" method="post"> -->
+  <!-- 	    {%csrf_token%} -->
+  <!-- 	    {% for questionStatistics in questionStatisticses %} -->
+  <!-- 	    {{questionStatistics.question.question_text}} -->
+  <!-- 	    isEditable = {{questionStatistics.question.isEditable}} -->
+  <!-- 	    <button class="btn btn-danger" style="width:20%" type="submit" name="finalize" value="{{questionStatistics.question.id}}">Toggle Finalization State</button> -->
+  <!-- 	    {% if questionStatistics.question.question_type == 'S' %} -->
+  <!-- 	    {% for choiceCount in  questionStatistics.choiceCounts %} -->
+  <!-- 	    <p>{{choiceCount.choice}} Total Count:{{choiceCount.count}}</p> -->
+  <!-- 	    {% endfor %} -->
+  <!-- 	    {% elif questionStatistics.question.question_type == 'T' %} -->
+  <!-- {% for text_answer in questionStatistics.text_answers %} -->
+  <!-- 	    <p>{{text_answer.answer}}</p> -->
+  <!-- 	    {% endfor %} -->
+  <!-- 	    {% endif %} -->
+  <!-- 	    {% endfor %} -->
+  <!-- 	  </form> -->
+      <h1>Question Response Statistics</h1>
+      <div style="width:100%">
+	<form action="" method="post">
+	  {%csrf_token%}
+	  <ul class="list-group">
 	    {% for questionStatistics in questionStatisticses %}
-	    {{questionStatistics.question.question_text}}
-	    isEditable = {{questionStatistics.question.isEditable}}
-	    <button class="btn btn-danger" style="width:20%" type="submit" name="finalize" value="{{questionStatistics.question.id}}">Toggle Finalization State</button>
+	    
+	    <li class="list-group-item list-group-item-primary">
+	      <div style="line-height:2.5em;display:inline-block;width:85%"> Question:&nbsp;&nbsp;&nbsp;{{questionStatistics.question.question_text}}</div>
+	      {% if questionStatistics.question.isEditable %}
+	     <button class="btn btn-danger float-right" type="submit" name="finalize" value="{{questionStatistics.question.id}}" style="height:2.5em;">Finalize</button>	
+	      {% else %}
+	      <button class="btn btn-info float-right" type="submit" name="finalize" value="{{questionStatistics.question.id}}" style="height:2.5em;">Unfinalize</button>	
+	    </li>
+	      {% endif %}
+	    <div>
+
+	    </div>
+	    <div class="container-fluid">
 	    {% if questionStatistics.question.question_type == 'S' %}
-	    {% for choiceCount in  questionStatistics.choiceCounts %}
-	    <p>{{choiceCount.choice}} Total Count:{{choiceCount.count}}</p>
-	    {% endfor %}
+	      <ul class="list-group list-group-flush">
+		{% for choiceCount in  questionStatistics.choiceCounts %}
+		<li class="list-group-item">Choice {{forloop.counter}}: {{choiceCount.choice}} <span class="float-right">Total Count: {{choiceCount.count}}</span></li>
+		{% endfor %}
+	      </ul>
 	    {% elif questionStatistics.question.question_type == 'T' %}
-  {% for text_answer in questionStatistics.text_answers %}
-	    <p>{{text_answer.answer}}</p>
-	    {% endfor %}
+	      <ul class="list-group list-group-flush">
+	      {% for text_answer in questionStatistics.text_answers %}
+	      <li class="list-group-item">{{text_answer.answer}}</li>
+	      {% endfor %}
+	    </ul>
 	    {% endif %}
+	    </div>
 	    {% endfor %}
-	  </form>
+	  </ul>
+	</form>
+      </div>
 	  {% endif%}
 
 
