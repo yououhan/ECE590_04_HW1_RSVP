@@ -330,24 +330,25 @@ def event_create(request):
             register=RegisterEvent(event=event,
                                    user=user,
                                    identity = '0',
-                                   register_state ='1' 
+                                   register_state ='1'#register the creator as the owner of the event
             )
             register.save()
+            form.save()
             #may change here later
-            if form.cleaned_data['plusOne']:
-                question=Question(event=event,
-                                  question_text="will you have anyone come with you?",
-                                  question_type='S'
-                )
-                question.save()
-                no=Choice(question=question,
-                          choice_text="NO"
-                )
-                no.save()
-                yes=Choice(question=question,
-                           choice_text="YES"
-                )
-                yes.save()
+            # if form.cleaned_data['plusOne']:
+            #     question=Question(event=event,
+            #                       question_text="will you have anyone come with you?",
+            #                       question_type='S'
+            #     )
+            #     question.save()
+            #     no=Choice(question=question,
+            #               choice_text="NO"
+            #     )
+            #     no.save()
+            #     yes=Choice(question=question,
+            #                choice_text="YES"
+            #     )
+            #     yes.save()
             return redirect('../home')
     else:
         form = EventForm()
