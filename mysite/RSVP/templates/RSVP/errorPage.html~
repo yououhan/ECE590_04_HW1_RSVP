@@ -1,9 +1,0 @@
-{% extends "RSVP/navbar.html" %}
-
-{% block title %}homePage{% endblock %}
-
-{% block content %}
-<h1>YOU HAVE NO ACCESS TO THIS PAGE</h1>
-<img src="https://pokemongo.gamepress.gg/sites/default/files/2018-01/pokemon_icon_135_00.png">
-<h1>ARE you trying to do something evil</h1>
-{% endblock%}

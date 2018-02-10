@@ -51,6 +51,10 @@
 	</div>
 	{% endif%}
       </form>
+      
+<!--plueone-->
+{% if event.plus_one_permissible %}
+
       {% if showPlusOneQuestions%}
       <form method="post" action="">
 	{%csrf_token%}
@@ -88,5 +92,6 @@
 	  {% endif %}
 	</div>
       </form>
+ {% endif%}
     </div>
 {% endblock%}

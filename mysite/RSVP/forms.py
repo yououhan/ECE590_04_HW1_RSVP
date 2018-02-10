@@ -14,7 +14,6 @@ class EventForm(ModelForm):
     class Meta:
         model = Event
         fields = ['event_name', 'event_time', 'plus_one_permissible']
-#        widgets = {'event_time' : forms.SelectDateWidget()}
 
 class Questionform(ModelForm):
     class Meta:
