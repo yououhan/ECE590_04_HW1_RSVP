@@ -15,32 +15,6 @@ from django.core.mail import send_mail
 from django.forms import inlineformset_factory
 from django.core.exceptions import ObjectDoesNotExist
 
-# def makeMultiChoiceAnswerform(question):
-#     choicesQueryset = Choice.objects.filter(question=question.id)
-#     class multiChoiceAnswerform(forms.Form):
-#         question_text = forms.CharField(widget=forms.TextInput(attrs={'placeholder': question.question_text}),disabled = True, label=False)
-#         choices = forms.ModelChoiceField(queryset=choicesQueryset)
-#     return multiChoiceAnswerform
-
-# def questionAnswerView(request,event_id,guest_id):
-#     user = request.user
-#     event=get_object_or_404(Event,pk = event_id)
-#     permission = get_object_or_404(RrgisterEvent,event=event,user=user)
-#     if permission.identity == '2':
-#         return questionAnswer(request,event_id)
-#     else:
-#         return questionAnserAll(request,event_id,guest_id,permission.identity)
-
-# def questionAnswerAll(request,event_id,guest_id,permission):
-#     user=request.user
-#     event=get_object_or_404(Event,pk=event_id)
-#     guest=get_object_or_404(User,pk=guest_id)
-#     guestAccess=get_object_or_404(RegisterEvnet,event=event,user=guest)
-#     if guestAccess == '2':
-# #        return 
-# #    else:
-#         return HttpResponse('seems that the guest is not in this event')
-
 
 class QuestionWithResponse:
     def __init__(self, question, choices, response):
@@ -59,7 +33,7 @@ def questionView(request,event_id,guest_id):
         return viewAnswer(request,event,guest,False)
     if isOwner(user,event):
         return viewAnswer(request,event,guest,True)
-    return HttpResponse('no access to this page')
+    return render(request,'RSVP/errorPage.html',{'username':user})
 
 def viewAnswer(request,event,guest,ownership):
     registerEvent = get_object_or_404(RegisterEvent,event=event,user=guest)
@@ -75,6 +49,7 @@ def viewAnswer(request,event,guest,ownership):
     questionIds = Question.objects.values_list('id').filter(event=event, question_type='S')
     choices = Choice.objects.filter(question__in=questionIds)
     return render(request,'RSVP/questionAnswer.html',{
+        'username':request.user,
         'choices':choices,
         'multiChoiceQuestions':multiChoiceQuestions,
         'textQuestions':textQuestions,
@@ -141,7 +116,7 @@ def questionAnswer(request, event_id):
     event = get_object_or_404(Event, pk=event_id)
     user = request.user
     if not isGuest(user,event):
-        return HttpResponse('you have no access to this page')
+        return render(request,'RSVP/errorPage.html',{'username':user})
     registerEvent = get_object_or_404(RegisterEvent, event=event, user=user, identity='2')
     multiChoiceQuestions = Question.objects.filter(event=event, question_type='S')
     textQuestions = Question.objects.filter(event=event, question_type='T')
@@ -171,6 +146,7 @@ def questionAnswer(request, event_id):
     questionIds = Question.objects.values_list('id').filter(event=event_id, question_type='S')
     choices = Choice.objects.filter(question__in=questionIds)
     return render(request, 'RSVP/questionAnswer.html',{
+        'username':request.user,
         'choices':choices,
         'event': event,
         'showPlusOneQuestions': showPlusOneQuestions,
@@ -178,6 +154,7 @@ def questionAnswer(request, event_id):
         'textQuestions':textQuestions,
         'questionWithResponses': questionWithResponses,
         'questionWithPlusOneResponses': questionWithPlusOneResponses,
+         'noSubmit':False
         })
 
 
@@ -232,7 +209,7 @@ def questionPageCreate(request,event_id):
     user = request.user
     event = get_object_or_404(Event,pk = event_id)
     if not isOwner(user,event):
-        return HttpResponse('you have no access to this page')
+        return render(request,'RSVP/errorPage.html',{'username':user})
     if request.method == 'POST':
         QuestionForm = Questionform(request.POST)
         if QuestionForm.is_valid():
@@ -242,7 +219,8 @@ def questionPageCreate(request,event_id):
         QuestionForm = Questionform()
     return render(request,'RSVP/questionPage.html',{
         'Questionform': QuestionForm,
-        'isCreate':'1'
+        'isCreate':'1',
+        'username':user
     })
         
     
@@ -252,7 +230,7 @@ def questionPageEdit(request, event_id, question_id):
     question = get_object_or_404(Question,pk=question_id)
     if isOwner(user,event):
         return questionPageEditOwner(request,question)
-    return HttpResponse('you have no access to this page')
+    return render(request,'RSVP/errorPage.html',{'username':user})
 
 
 def questionEdit(QuestionForm,question):
@@ -274,7 +252,23 @@ def addChoice(newChoiceForm,question):
         choice_text = newChoiceText
     )
     newChoice.save()
-    
+
+def sentEmail(toBeDeleted,question):
+    toSent = MultiChoicesResponse.objects.filter(answer=toBeDeleted)
+    emailList = []
+    for response in toSent:
+        registerinfo = response.register_event
+        people = registerinfo.user
+        emailList.append(people.email)
+    mailMessage = 'the choice '+ toBeDeleted.choice_text +' in the question '+ question.question_text
+    mailMessage = mailMessage + ' has been deleted. please login to vcm-3030.vm.duke.edu:8080/RSVP (or vcm-2827.vm.duke.edu:8080/RSVP) to change your answer'
+    send_mail(
+        'Question Change in YouEeveent',
+        mailMessage,
+        'yiweiliant@gmail.com',
+        emailList,
+        fail_silently=False,
+    )
     
 def questionPageEditOwner(request,question):
     choice = Choice.objects.filter(question=question)
@@ -289,15 +283,7 @@ def questionPageEditOwner(request,question):
                 addChoice(newChoiceForm,question)
         elif request.POST.get('delete'):
             toBeDeleted = Choice.objects.get(pk=request.POST.get('delete'))
-            #sent email do it later there will be a function to sent email
-            mailMessage = 'the choice '+ toBeDeleted.choice_text +' in the question '+ question.question_text
-            send_mail(
-                'Is that easy?',
-                mailMessage,
-                'yiweiliant@gmail.com',
-                ['yiweiliant@outlook.com'],
-                fail_silently=False,
-            )
+            sentEmail(toBeDeleted,question)     
             toBeDeleted.delete()
         elif request.POST.get('deleteQ'):
             question.delete()
@@ -309,6 +295,7 @@ def questionPageEditOwner(request,question):
         'Questionform': QuestionForm,
         'question':question,
         'choice':choice,
+        'username':request.user
     })
 
 def newEvent(form,creator):
@@ -334,21 +321,6 @@ def event_create(request):
             )
             register.save()
             form.save()
-            #may change here later
-            # if form.cleaned_data['plusOne']:
-            #     question=Question(event=event,
-            #                       question_text="will you have anyone come with you?",
-            #                       question_type='S'
-            #     )
-            #     question.save()
-            #     no=Choice(question=question,
-            #               choice_text="NO"
-            #     )
-            #     no.save()
-            #     yes=Choice(question=question,
-            #                choice_text="YES"
-            #     )
-            #     yes.save()
             return redirect('../home')
     else:
         form = EventForm()
@@ -411,8 +383,8 @@ def events_list(request,event_id):
     elif isVendor(user,event):
         return events_list_vender(request,event)
     else:
-        return HttpResponse('you have on access to this page(will be better)')
-
+        return render(request,'RSVP/errorPage.html',{'username':user})
+    
 def countStatistics(questions):
     questionStatisticses = []
     for question in questions:
@@ -467,7 +439,7 @@ def events_list_owner(request, event):
                 new_userName = inviteNewUserForm.cleaned_data.get('username')
                 new_user=User.objects.get(username=new_userName)
                 newInvite=RegisterEvent(
-                    event=get_object_or_404(Event,pk=event_id),
+                    event=event,
                     user = new_user,
                     identity= request.POST.get('invite'),
                     register_state='0'
