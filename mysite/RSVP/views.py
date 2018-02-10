@@ -17,6 +17,8 @@ from django.core.exceptions import ObjectDoesNotExist
 
 
 class QuestionWithResponse:
+    #this class is used to create the questionPage
+    #with an array of this QuestionWithResponse it is easy to display
     def __init__(self, question, choices, response):
         self.question = question
         self.choices = choices
@@ -24,6 +26,10 @@ class QuestionWithResponse:
 
         
 def questionView(request,event_id,guest_id):
+    # this function is the main function of the url:event/<int:event_id>/questionView/<int:guest_id>
+    #this function would help the vendor and the owner
+    #to view the answer of a guest
+    #can call a function accordingly
     event = get_object_or_404(Event,pk = event_id)
     user = request.user
     guest = get_object_or_404(User,pk = guest_id)
@@ -36,11 +42,13 @@ def questionView(request,event_id,guest_id):
     return render(request,'RSVP/errorPage.html',{'username':user})
 
 def viewAnswer(request,event,guest,ownership):
+    # this function is for owner or vendor to view the answer of a guest
+    # the owner can see all the answer while vendor can only see the question that is visible
     registerEvent = get_object_or_404(RegisterEvent,event=event,user=guest)
     if ownership:
-        question = Question.objects.filter(event=event)
+        question = Question.objects.filter(event=event)   #owner can see
     else:
-        question = Question.objects.filter(event=event,isVisible=True)
+        question = Question.objects.filter(event=event,isVisible=True)  # vendor can see
     multiChoiceQuestions = question.filter(event=event, question_type='S')
     textQuestions = question.filter(event=event, question_type='T')
     questionWithPlusOneResponses = addAllQuestion(multiChoiceQuestions,textQuestions,registerEvent, True)
@@ -60,7 +68,12 @@ def viewAnswer(request,event,guest,ownership):
         'questionWithPlusOneResponses': questionWithPlusOneResponses
     })
     
-def addAllQuestion(multiChoiceQuestions,textQuestions,registerEvent, isPlusOne):
+def addAllQuestion(multiChoiceQuestions,textQuestions,registerEvent,isPlusOne):
+    # this function is to create an array of QuestionWithResponse
+    # with the input of all the question that need to add
+    # and the register info (registerEvent)
+    # it would return an array that contain all the answer
+    # for each question in a event of a guest
     questionWithResponses = []
     for question in multiChoiceQuestions:
         choices = Choice.objects.filter(question=question)
@@ -79,6 +92,8 @@ def addAllQuestion(multiChoiceQuestions,textQuestions,registerEvent, isPlusOne):
     return questionWithResponses
 
 def saveResponses(requestPost, multiChoiceQuestions, textQuestions, registerEvent, isPlusOne):
+    # is funciton would create responses or update a old responses
+    # of all the question for one guest of one event
     for question in multiChoiceQuestions:
         if isPlusOne:
             choice_selected=requestPost.get('plus_one_' + str(question.id))
@@ -113,6 +128,11 @@ def saveResponses(requestPost, multiChoiceQuestions, textQuestions, registerEven
         textResponse.save()
     
 def questionAnswer(request, event_id):
+    # this function is the main function of the url:event/<int:event_id>/questionAnswer
+    # it would show all the response of a guest for an event 
+    # and if it is a POST it would create or update the response
+    # if this event can bring a +1 it would show a button if clicked a new form would show
+    # and guest can add a new response for the +1
     event = get_object_or_404(Event, pk=event_id)
     user = request.user
     if not isGuest(user,event):
@@ -134,7 +154,6 @@ def questionAnswer(request, event_id):
                 showPlusOneQuestions = True
             else:
                 showPlusOneQuestions = False
-                #delete all the response by the guest
                 MultiChoicesResponse.objects.filter(register_event=registerEvent, is_plus_one=True).delete()
                 TextResponse.objects.filter(register_event=registerEvent, is_plus_one=True).delete()
         elif request.POST.get('submit'):
@@ -154,29 +173,33 @@ def questionAnswer(request, event_id):
         'textQuestions':textQuestions,
         'questionWithResponses': questionWithResponses,
         'questionWithPlusOneResponses': questionWithPlusOneResponses,
-         'noSubmit':False
+        'noSubmit':False
         })
 
 
 def isOwner(user,event):
+    # this function check if the user is the owner of a event
     permission = get_object_or_404(RegisterEvent,event=event,user=user)
     if permission.identity == '0':
         return True
     return False
 
 def isVendor(user,event):
+    # this function check if the user is the vendor of a event
     permission = get_object_or_404(RegisterEvent,event=event,user=user)
     if permission.identity == '1':
         return True
     return False
 
 def isGuest(user,event):
+    # this function check if the user is the guest of a event
     permission = get_object_or_404(RegisterEvent,event=event,user=user)
     if permission.identity == '2':
         return True
     return False
     
 def questionCreate(QuestionForm,event):
+    # this function would creat and save a new question
     question_text = QuestionForm.cleaned_data['question_text']
     question_type = QuestionForm.cleaned_data['question_type']
     isEditable =  QuestionForm.cleaned_data['isEditable']
@@ -194,11 +217,13 @@ def questionCreate(QuestionForm,event):
     return question
             
 class ChoiceCount:
+    # this class is used to save the statistic of each choice
     def __init__(self, choice, count):
         self.choice = choice
         self.count = count
         
 class QuestionStatistics:
+    # this class is to hold the statistic of each question
     def __init__(self, question, choiceCounts, text_answers):
         self.question = question
         self.choiceCounts = choiceCounts
@@ -206,6 +231,8 @@ class QuestionStatistics:
 
 
 def questionPageCreate(request,event_id):
+    # this function is the main function of the url:event/<int:event_id>/questionPage/
+    # it would creat and save a new question for a event
     user = request.user
     event = get_object_or_404(Event,pk = event_id)
     if not isOwner(user,event):
@@ -225,6 +252,8 @@ def questionPageCreate(request,event_id):
         
     
 def questionPageEdit(request, event_id, question_id):
+    # this function is the main fuction of the url:event/<int:event_id>/questionPage/<int:question_id>/
+    # it would update the question text or add or delete the choice of that question
     event = get_object_or_404(Event, pk=event_id)
     user = request.user
     question = get_object_or_404(Question,pk=question_id)
@@ -234,6 +263,7 @@ def questionPageEdit(request, event_id, question_id):
 
 
 def questionEdit(QuestionForm,question):
+    # this funciton is to edit a existed question
     question_text = QuestionForm.cleaned_data['question_text']
     question_type = QuestionForm.cleaned_data['question_type']
     isEditable =  QuestionForm.cleaned_data['isEditable']
@@ -246,6 +276,7 @@ def questionEdit(QuestionForm,question):
 
 
 def addChoice(newChoiceForm,question):
+    # this funciton is to add choice to a question
     newChoiceText = newChoiceForm.cleaned_data.get('choice_text')
     newChoice = Choice(
         question = question,
@@ -254,6 +285,7 @@ def addChoice(newChoiceForm,question):
     newChoice.save()
 
 def sentEmail(toBeDeleted,question):
+    # this function is to sent email to the guest who chose the choice that is deleted
     toSent = MultiChoicesResponse.objects.filter(answer=toBeDeleted)
     emailList = []
     for response in toSent:
@@ -271,6 +303,9 @@ def sentEmail(toBeDeleted,question):
     )
     
 def questionPageEditOwner(request,question):
+    # this function is called by the function questionPageEdit,
+    # and should be accessed by the owner
+    # it can help the owner to add or delete choice, change or delete question 
     choice = Choice.objects.filter(question=question)
     if request.method == 'POST':
         if request.POST.get('changeQuestion'):
@@ -299,16 +334,20 @@ def questionPageEditOwner(request,question):
     })
 
 def newEvent(form,creator):
+    # this function is to creat and save a new event
     event_name = form.cleaned_data['event_name']
     event_time = form.cleaned_data['event_time']
+    plus_one_permissible = form.cleaned_data['plus_one_permissible']
     event = Event(event_name=event_name,
                   event_time=event_time,
-                  creator = creator
+                  creator = creator,
+                  plus_one_permissible = plus_one_permissible
     )
     event.save()
     return event
 
 def event_create(request):
+    # this function is the main function of the url: event_create/
     user = request.user
     if request.method == 'POST':
         form = EventForm(request.POST)
@@ -318,7 +357,6 @@ def event_create(request):
                                    user=user,
                                    identity = '0',
                                    register_state ='1'
-                                   #able to +1
             )
             register.save()
             return redirect('../home')
@@ -330,20 +368,18 @@ def event_create(request):
         
 
 #testing
-def sign_in(request):
-    Events = Event.objects.all()
+# def sign_in(request):
+#     Events = Event.objects.all()
     
-    return render(request, 'RSVP/sign_in.html', {
-        # don't forget to pass it in, and the last comma
-        'Events': Events,
-    })
+#     return render(request, 'RSVP/sign_in.html', {
+#         'Events': Events,
+#     })
 
-# Create your views here.
-#def sign_in(request):
-    # View code here...
-#    return render(request, 'RSVP/sign_in.html')
 
 def home(request):
+    # this function is the main function of the url: /RSVP/home
+    # it would show all the event a user have
+    # and help the user to accpet or decline a event
     user = get_object_or_404(User,username = request.user.username)
     own =  RegisterEvent.objects.filter(user=user,identity=0)
     ownEventsPending = own.filter(register_state = 0)
@@ -376,6 +412,9 @@ def home(request):
 
 
 def events_list(request,event_id):
+    # is function is the main funciton of the url:RSVP/event/<int:event_id>/
+    # which can only be accessed by the vendor and owner
+    # and call different funciton accordingly
     user = request.user
     event = get_object_or_404(Event,pk = event_id)
     if isOwner(user,event):
@@ -386,6 +425,7 @@ def events_list(request,event_id):
         return render(request,'RSVP/errorPage.html',{'username':user})
     
 def countStatistics(questions):
+    # this function is used to calculate the statistics of questions
     questionStatisticses = []
     for question in questions:
         if question.question_type == 'S':
@@ -402,6 +442,8 @@ def countStatistics(questions):
 
 
 def events_list_vender(request, event):
+    # this function is called by events_list, and can should only be accessed by vender
+    # it would display all the guests and the statistic of all the questions the user have access
     if request.method == 'POST':
         toBeChangedQuestion = get_object_or_404(Question, pk=request.POST.get("finalize"))       
         toBeChangedQuestion.isEditable = not toBeChangedQuestion.isEditable
@@ -429,6 +471,9 @@ def events_list_vender(request, event):
 
     
 def events_list_owner(request, event):
+    # this function is called by events_list, and can should only be accessed by owner
+    # it display all the list of owner vendor guest and question
+    # it can help the owner add new question
     if request.method == 'POST':
         if request.POST.get('delete_event'):
             event.delete()
@@ -482,27 +527,10 @@ def events_list_owner(request, event):
         'username':username,
         'inviteNewUserform':inviteNewUserForm,
     })
-#pass the event ID here and can use the get object funciton
 
-def index(request):
-    from django import forms
-    class NameForm(forms.Form):
-        your_name = forms.CharField(label='Your name', max_length=100)
-    template = "RSVP/index.html"
-    context = { "form" : NameForm() }
-    return render( request, template, context )
-#    return render(request, 'RSVP/startbootstrap-landing-page/index.html')
-#    return render(request, 'RSVP/index.html')
-
-def sign_up(request):
-    from django import forms
-    class NameForm(forms.Form):
-        your_name = forms.CharField(label='Your name', max_length=100)
-    template = "RSVP/sign_up.html"
-    context = { "form" : NameForm() }
-    return render( request, template, context )
 
 def signup(request):
+    # sign up page
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():

@@ -7,6 +7,8 @@
 <form method="post">
   {% csrf_token %}
   {{ form.as_p }}
-  <button type="submit">Login</button>
+  <button  class="btn btn-lg btn-primary btn-block" type="submit">Login</button>
 </form>
+<hr>
+<button class="btn btn-lg btn-primary btn-block" onclick="location='/RSVP/accounts/signup'">No account？sign up</button>
 {% endblock %}
