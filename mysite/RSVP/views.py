@@ -33,7 +33,7 @@ def questionView(request,event_id,guest_id):
         return viewAnswer(request,event,guest,False)
     if isOwner(user,event):
         return viewAnswer(request,event,guest,True)
-    return HttpResponse('no access to this page')
+    return render(request,'RSVP/errorPage.html',{'username':user})
 
 def viewAnswer(request,event,guest,ownership):
     registerEvent = get_object_or_404(RegisterEvent,event=event,user=guest)
@@ -116,7 +116,7 @@ def questionAnswer(request, event_id):
     event = get_object_or_404(Event, pk=event_id)
     user = request.user
     if not isGuest(user,event):
-        return HttpResponse('you have no access to this page')
+        return render(request,'RSVP/errorPage.html',{'username':user})
     registerEvent = get_object_or_404(RegisterEvent, event=event, user=user, identity='2')
     multiChoiceQuestions = Question.objects.filter(event=event, question_type='S')
     textQuestions = Question.objects.filter(event=event, question_type='T')
@@ -209,7 +209,7 @@ def questionPageCreate(request,event_id):
     user = request.user
     event = get_object_or_404(Event,pk = event_id)
     if not isOwner(user,event):
-        return HttpResponse('you have no access to this page')
+        return render(request,'RSVP/errorPage.html',{'username':user})
     if request.method == 'POST':
         QuestionForm = Questionform(request.POST)
         if QuestionForm.is_valid():
@@ -230,7 +230,7 @@ def questionPageEdit(request, event_id, question_id):
     question = get_object_or_404(Question,pk=question_id)
     if isOwner(user,event):
         return questionPageEditOwner(request,question)
-    return HttpResponse('you have no access to this page')
+    return render(request,'RSVP/errorPage.html',{'username':user})
 
 
 def questionEdit(QuestionForm,question):
@@ -383,8 +383,8 @@ def events_list(request,event_id):
     elif isVendor(user,event):
         return events_list_vender(request,event)
     else:
-        return HttpResponse('you have on access to this page(will be better)')
-
+        return render(request,'RSVP/errorPage.html',{'username':user})
+    
 def countStatistics(questions):
     questionStatisticses = []
     for question in questions:
