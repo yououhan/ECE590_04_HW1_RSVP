@@ -133,8 +133,7 @@ STATIC_URL = '/static/'
 AUTHENTICATION_BACKENDS = (
         'django.contrib.auth.backends.ModelBackend',
 )
-
-LOGIN_REDIRECT_URL = '../../home'
+LOGIN_REDIRECT_URL = '/RSVP/home'
 
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
