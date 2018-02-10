@@ -15,32 +15,6 @@ from django.core.mail import send_mail
 from django.forms import inlineformset_factory
 from django.core.exceptions import ObjectDoesNotExist
 
-# def makeMultiChoiceAnswerform(question):
-#     choicesQueryset = Choice.objects.filter(question=question.id)
-#     class multiChoiceAnswerform(forms.Form):
-#         question_text = forms.CharField(widget=forms.TextInput(attrs={'placeholder': question.question_text}),disabled = True, label=False)
-#         choices = forms.ModelChoiceField(queryset=choicesQueryset)
-#     return multiChoiceAnswerform
-
-# def questionAnswerView(request,event_id,guest_id):
-#     user = request.user
-#     event=get_object_or_404(Event,pk = event_id)
-#     permission = get_object_or_404(RrgisterEvent,event=event,user=user)
-#     if permission.identity == '2':
-#         return questionAnswer(request,event_id)
-#     else:
-#         return questionAnserAll(request,event_id,guest_id,permission.identity)
-
-# def questionAnswerAll(request,event_id,guest_id,permission):
-#     user=request.user
-#     event=get_object_or_404(Event,pk=event_id)
-#     guest=get_object_or_404(User,pk=guest_id)
-#     guestAccess=get_object_or_404(RegisterEvnet,event=event,user=guest)
-#     if guestAccess == '2':
-# #        return 
-# #    else:
-#         return HttpResponse('seems that the guest is not in this event')
-
 
 class QuestionWithResponse:
     def __init__(self, question, choices, response):
@@ -180,6 +154,7 @@ def questionAnswer(request, event_id):
         'textQuestions':textQuestions,
         'questionWithResponses': questionWithResponses,
         'questionWithPlusOneResponses': questionWithPlusOneResponses,
+         'noSubmit':False
         })
 
 
@@ -277,7 +252,23 @@ def addChoice(newChoiceForm,question):
         choice_text = newChoiceText
     )
     newChoice.save()
-    
+
+def sentEmail(toBeDeleted,question):
+    toSent = MultiChoicesResponse.objects.filter(answer=toBeDeleted)
+    emailList = []
+    for response in toSent:
+        registerinfo = response.register_event
+        people = registerinfo.user
+        emailList.append(people.email)
+    mailMessage = 'the choice '+ toBeDeleted.choice_text +' in the question '+ question.question_text
+    mailMessage = mailMessage + ' has been deleted. please login to vcm-3030.vm.duke.edu:8080/RSVP (or vcm-2827.vm.duke.edu:8080/RSVP) to change your answer'
+    send_mail(
+        'Question Change in YouEeveent',
+        mailMessage,
+        'yiweiliant@gmail.com',
+        emailList,
+        fail_silently=False,
+    )
     
 def questionPageEditOwner(request,question):
     choice = Choice.objects.filter(question=question)
@@ -292,15 +283,7 @@ def questionPageEditOwner(request,question):
                 addChoice(newChoiceForm,question)
         elif request.POST.get('delete'):
             toBeDeleted = Choice.objects.get(pk=request.POST.get('delete'))
-            #sent email do it later there will be a function to sent email
-            mailMessage = 'the choice '+ toBeDeleted.choice_text +' in the question '+ question.question_text
-            send_mail(
-                'Is that easy?',
-                mailMessage,
-                'yiweiliant@gmail.com',
-                ['yiweiliant@outlook.com'],
-                fail_silently=False,
-            )
+            sentEmail(toBeDeleted,question)     
             toBeDeleted.delete()
         elif request.POST.get('deleteQ'):
             question.delete()
@@ -456,7 +439,7 @@ def events_list_owner(request, event):
                 new_userName = inviteNewUserForm.cleaned_data.get('username')
                 new_user=User.objects.get(username=new_userName)
                 newInvite=RegisterEvent(
-                    event=get_object_or_404(Event,pk=event_id),
+                    event=event,
                     user = new_user,
                     identity= request.POST.get('invite'),
                     register_state='0'
