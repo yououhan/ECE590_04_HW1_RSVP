@@ -38,16 +38,16 @@ REGISTER_STATE_CHOICES = (
 #         return self.username
 
 class Event(models.Model):
-    event_name = models.CharField(max_length = EVENT_NAME_MAX_LENGTH)
+    event_name = models.CharField('Event Name', max_length = EVENT_NAME_MAX_LENGTH)
     creator = models.ForeignKey(
         User,
         null = True,
 #        limit_choices_to = RegisterEvent(identity = '0'),
         on_delete=models.SET_NULL#Set the reference to NULL (requires the field to be nullable). For instance, when you delete a User, you might want to keep the comments he posted on blog posts, but say it was posted by an anonymous (or deleted) user.
     )
-    event_time = models.DateTimeField('event held time', default = timezone.now)
+    event_time = models.DateTimeField('Event Time', default = timezone.now)
     create_time = models.DateTimeField('time created', auto_now_add = True)
-    plus_one_permissible = models.BooleanField()
+    plus_one_permissible = models.BooleanField('Is guest allowed to bring a plus one?')
     last_updated_time = models.DateTimeField('last updated time', auto_now = True)
     def __str__(self):
         return self.event_name

@@ -356,9 +356,10 @@ def event_create(request):
             register=RegisterEvent(event=event,
                                    user=user,
                                    identity = '0',
-                                   register_state ='1'
+                                   register_state ='1'#register the creator as the owner of the event
             )
             register.save()
+            form.save()
             return redirect('../home')
     else:
         form = EventForm()

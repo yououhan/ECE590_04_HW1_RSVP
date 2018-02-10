@@ -10,10 +10,10 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 
 class EventForm(ModelForm):
+#    plusOne = forms.BooleanField(label='can guest +1?',required=False)    needs to write save function
     class Meta:
         model = Event
-        fields = ['event_name', 'event_time','plus_one_permissible']
-#        widgets = {'event_time' : forms.SelectDateWidget()}
+        fields = ['event_name', 'event_time', 'plus_one_permissible']
 
 class Questionform(ModelForm):
     class Meta:
