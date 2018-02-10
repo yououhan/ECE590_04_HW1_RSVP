@@ -75,6 +75,7 @@ def viewAnswer(request,event,guest,ownership):
     questionIds = Question.objects.values_list('id').filter(event=event, question_type='S')
     choices = Choice.objects.filter(question__in=questionIds)
     return render(request,'RSVP/questionAnswer.html',{
+        'username':request.user,
         'choices':choices,
         'multiChoiceQuestions':multiChoiceQuestions,
         'textQuestions':textQuestions,
@@ -171,6 +172,7 @@ def questionAnswer(request, event_id):
     questionIds = Question.objects.values_list('id').filter(event=event_id, question_type='S')
     choices = Choice.objects.filter(question__in=questionIds)
     return render(request, 'RSVP/questionAnswer.html',{
+        'username':request.user,
         'choices':choices,
         'event': event,
         'showPlusOneQuestions': showPlusOneQuestions,
@@ -242,7 +244,8 @@ def questionPageCreate(request,event_id):
         QuestionForm = Questionform()
     return render(request,'RSVP/questionPage.html',{
         'Questionform': QuestionForm,
-        'isCreate':'1'
+        'isCreate':'1',
+        'username':user
     })
         
     
@@ -309,6 +312,7 @@ def questionPageEditOwner(request,question):
         'Questionform': QuestionForm,
         'question':question,
         'choice':choice,
+        'username':request.user
     })
 
 def newEvent(form,creator):

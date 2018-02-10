@@ -1,13 +1,14 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title></title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-  </head>
-  <body>
+{% extends "RSVP/navbar.html" %}
+
+{% block title %}event details{% endblock %}
+
+{% block content %}
+
+
+<!-- question here -->
     <div class="container">
       <form method="post" action="">
-	<h1>Please answer the following questions</h1>
+	<h1>Questions for guests</h1>
 	{% if event.plus_one_permissible %}
 	<div class="text-center" style="margin-bottom:20px">
 	  {% if showPlusOneQuestions %}
@@ -44,14 +45,16 @@
 	    {% endfor %}
 	  </ul>
 	</div>
+	{% if noSubmit == False%}
 	<div class="text-center" style="margin-top:30px">
 	  <button class="btn btn-primary" style="width:20%" type="submit" name="submit" value="guest">Submit</button>
-	  </div>
+	</div>
+	{% endif%}
       </form>
       {% if showPlusOneQuestions%}
       <form method="post" action="">
 	{%csrf_token%}
-	<h1>Please answer questions for your plus one</h1>
+	<h1>questions for plus one</h1>
 	<div style="width:100%">
 	  <ul class="list-group">
 	    {% for questionWithPlusOneResponse in questionWithPlusOneResponses%}
@@ -77,12 +80,13 @@
 	    {% endif %}
 	    {% endfor %}
 	  </ul>
+	  {% if noSubmit == False%}
 	  <div class="text-center" style="margin-top:30px">
 	    <button class="btn btn-primary" style="width:20%" type="submit" name="submit" value="plusOne">Submit</button>
-	  </div>	  
+	  </div>
+	  {% endif%}
 	  {% endif %}
 	</div>
       </form>
     </div>
-  </body>
-</html>
+{% endblock%}
