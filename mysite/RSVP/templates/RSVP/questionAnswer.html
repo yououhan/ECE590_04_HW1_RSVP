@@ -22,7 +22,7 @@
 	  {%csrf_token%}
 	  <ul class="list-group">
 	    {% for questionWithResponse in questionWithResponses%}
-	    <li class="list-group-item list-group-item-primary">Question: {{questionWithResponse.question.question_text}}
+	    <li class="list-group-item list-group-item-primary" style="margin-bottom:1px;">Question: {{questionWithResponse.question.question_text}}
 	    </li>
 	    {% if questionWithResponse.choices.count > 0 %}
 	    <div class="custom-control custom-radio container-fluid">
@@ -62,7 +62,7 @@
 	<div style="width:100%">
 	  <ul class="list-group">
 	    {% for questionWithPlusOneResponse in questionWithPlusOneResponses%}
-	    <li class="list-group-item list-group-item-primary">Question: {{questionWithPlusOneResponse.question.question_text}}
+	    <li class="list-group-item list-group-item-primary" style="margin-bottom:1px;">Question: {{questionWithPlusOneResponse.question.question_text}}
 	    </li>
 	    {% if questionWithPlusOneResponse.choices.count > 0 %}
 	    <div class="custom-control custom-radio container-fluid">

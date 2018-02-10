@@ -198,23 +198,23 @@ def isGuest(user,event):
         return True
     return False
     
-def questionCreate(QuestionForm,event):
-    # this function would creat and save a new question
-    question_text = QuestionForm.cleaned_data['question_text']
-    question_type = QuestionForm.cleaned_data['question_type']
-    isEditable =  QuestionForm.cleaned_data['isEditable']
-    isOptional =  QuestionForm.cleaned_data['isOptional']
-    isVisible = QuestionForm.cleaned_data['isVisible']
-    question = Question(
-        event=event,
-        question_text=question_text,
-        question_type=question_type,
-        isEditable=isEditable,
-        isOptional=isOptional,
-        isVisible=isVisible
-    )
-    question.save()
-    return question
+# def questionCreate(QuestionForm,event):
+#     # this function would creat and save a new question
+#     question_text = QuestionForm.cleaned_data['question_text']
+#     question_type = QuestionForm.cleaned_data['question_type']
+#     isEditable =  QuestionForm.cleaned_data['isEditable']
+#     isOptional =  QuestionForm.cleaned_data['isOptional']
+#     isVisible = QuestionForm.cleaned_data['isVisible']
+#     question = Question(
+#         event=event,
+#         question_text=question_text,
+#         question_type=question_type,
+#         isEditable=isEditable,
+#         isOptional=isOptional,
+#         isVisible=isVisible
+#     )
+#     question.save()
+#     return question
             
 class ChoiceCount:
     # this class is used to save the statistic of each choice
@@ -240,7 +240,10 @@ def questionPageCreate(request,event_id):
     if request.method == 'POST':
         QuestionForm = Questionform(request.POST)
         if QuestionForm.is_valid():
-            question = questionCreate(QuestionForm,event)
+            question = QuestionForm.save(commit = False)
+            question.event_id = event_id
+            question.save()
+            #question = questionCreate(QuestionForm,event)
             return redirect('./' + str(question.id))
     else:
         QuestionForm = Questionform()
@@ -339,7 +342,9 @@ def event_create(request):
     if request.method == 'POST':
         form = EventForm(request.POST)
         if form.is_valid():
-            event = form.save()
+            event = form.save(commit = False)
+            event.creator = user
+            event.save()
             register=RegisterEvent(event=event,
                                    user=user,
                                    identity = '0',
