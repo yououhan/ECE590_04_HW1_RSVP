@@ -33,7 +33,7 @@
 		  {% else %}
 		  <input type="radio" name="{{questionWithResponse.question.id}}" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
 		  {% endif %}
-		  <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br>
+		  <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label>
 		</li>
 		{% endfor %}
 	      </ul>
@@ -43,17 +43,6 @@
 	    {% endif %}
 	    {% endfor %}
 	  </ul>
-<<<<<<< HEAD
-	  <!-- {% if noSubmit != True%} -->
-	  <div class="text-center" style="margin-top:30px">
-	    <button class="btn btn-primary" text-center" style="width:20%" type="submit">Submit</button>
-	  </div>
-	  <!-- {% endif%} -->
-	</form>
-
-	
-      </div>
-=======
 	</div>
 	<div class="text-center" style="margin-top:30px">
 	  <button class="btn btn-primary" style="width:20%" type="submit" name="submit" value="guest">Submit</button>
@@ -74,11 +63,11 @@
 		{% for choice in questionWithPlusOneResponse.choices%}
 		<li class="list-group-item">
 		  {% if choice.id == questionWithPlusOneResponse.response.answer.id %}    
-		  <input type="radio" name="plus_one_{{questionWithPlusOneResponse.question.id}}" checked="checked" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
+		  <input type="radio" name="plus_one_{{questionWithPlusOneResponse.question.id}}" checked="checked" id="plus_one_choice{{ forloop.counter }}" value="{{ choice.id }}">
 		  {% else %}
-		  <input type="radio" name="plus_one_{{questionWithPlusOneResponse.question.id}}" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
+		  <input type="radio" name="plus_one_{{questionWithPlusOneResponse.question.id}}" id="plus_one_choice{{ forloop.counter }}" value="{{ choice.id }}">
 		  {% endif %}
-		  <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br>
+		  <label for="plus_one_choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br>
 		</li>
 		{% endfor %}
 	      </ul>
@@ -94,7 +83,6 @@
 	  {% endif %}
 	</div>
       </form>
->>>>>>> b9a868be771005fb25329faec44d2c8b92ba0279
     </div>
   </body>
 </html>

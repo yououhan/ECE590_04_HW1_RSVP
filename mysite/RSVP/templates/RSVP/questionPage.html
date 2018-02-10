@@ -1,25 +1,25 @@
 
 <!DOCTYPE html>
 <html>
-<head>
-	<title>own event</title>
+  <head>
+    <title>own event</title>
 
-	<!--the order maters here-->
-	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-   
+    <!--the order maters here-->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-	
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
-<!-- Latest compiled and minified JavaScript -->
+    <!-- Latest compiled and minified JavaScript -->
+    
+  </head>
   
-</head>
- 
-<body>
+  <body>
 
-<!--the navbar!!!!!!!!!!!!!!!!!!!!!!!!-->
+    <!--the navbar!!!!!!!!!!!!!!!!!!!!!!!!-->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
       <a class="navbar-brand" href="#">YouEeveent</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,7 +41,7 @@
     <div class="container">
 
       <h1>{{question.question_text}}</h1>
-      <div style="width:30%">
+      <div>
 	<form action="" method="post">
 	  {%csrf_token%}
 	  {% for error in form.non_field_errors %}
@@ -61,24 +61,15 @@
 	  </div>
 	  {% endfor %}
 	  {% if isCreate != '1'%}
-	  <button class="btn btn-primary" style="width:100%" name="changeQuestion" type="submit" value="changeQuestion">change Question</button>
+	  <button class="btn btn-primary" style="width:30%" name="changeQuestion" type="submit" value="changeQuestion">Change Question</button>
+	  <button class="btn btn-danger" style="width: 30%" name="deleteQ" type="submit" value="{{question.id}}" onclick="location='../../'">delete this question</button>
 	  {% endif%}
 	  {% if isCreate == '1'%}
-	  <button class="btn btn-primary" style="width:100%" name="changeQuestion" type="submit" value="changeQuestion">add Question</button>
+	  <button class="btn btn-primary" style="width:30%" name="changeQuestion" type="submit" value="changeQuestion">Add Question</button>
 	  {% endif%}
 	</form>
       </div>
-      
-      {% if isCreate != '1'%}
-      <form action="" method="post">
-	{%csrf_token%}
-	<div>
-	  <p>
-	    <button class="btn btn-danger" style="width:20%" name="deleteQ" type="submit" value="{{question.id}}" onclick="location='../../'">delete this question</button> 
-	  </p>
-	</div>
-      </form>
-   
+      {% if question.question_type != 'T' and isCreate != '1' %}
       <h2>Choices</h2>
       <form method="post" action="">
 	{%csrf_token%}
@@ -91,8 +82,7 @@
 	  {% endfor%}
 	</div>
       </form>
-
-	<div style="width:30%">
+      <div style="width:30%">
 	<form action="" method="post">
 	  {%csrf_token%}
 	  {% for error in form.non_field_errors %}
@@ -114,9 +104,9 @@
 	  <button class="btn btn-primary" style="width:100%" name="add_choice" type="submit" value="add_choice">add choice</button>
 	</form>
       </div>
+      {% endif %}
     </div>
-{% endif%}    
 </div>
 
-    </div>
+</div>
 
