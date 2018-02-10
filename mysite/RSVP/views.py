@@ -298,29 +298,29 @@ def questionPageEditOwner(request,question):
         'username':request.user
     })
 
-def newEvent(form,creator):
-    event_name = form.cleaned_data['event_name']
-    event_time = form.cleaned_data['event_time']
-    event = Event(event_name=event_name,
-                  event_time=event_time,
-                  creator = creator
-    )
-    event.save()
-    return event
+# def newEvent(form,creator):
+#     event_name = form.cleaned_data['event_name']
+#     event_time = form.cleaned_data['event_time']
+#     event = Event(event_name=event_name,
+#                   event_time=event_time,
+#                   creator = creator
+#     )
+#     event.save()
+#     return event
 
 def event_create(request):
     user = request.user
     if request.method == 'POST':
         form = EventForm(request.POST)
         if form.is_valid():
-            event = newEvent(form,user)
+            event = form.save()
+            #event = newEvent(form,user)
             register=RegisterEvent(event=event,
                                    user=user,
                                    identity = '0',
                                    register_state ='1'#register the creator as the owner of the event
             )
             register.save()
-            form.save()
             return redirect('../home')
     else:
         form = EventForm()
@@ -437,28 +437,31 @@ def events_list_owner(request, event):
             inviteNewUserForm = inviteNewUserform(request.POST)
             if inviteNewUserForm.is_valid():
                 new_userName = inviteNewUserForm.cleaned_data.get('username')
-                new_user=User.objects.get(username=new_userName)
+                new_user=User.objects.get(username=new_userName)                
                 newInvite=RegisterEvent(
                     event=event,
                     user = new_user,
                     identity= request.POST.get('invite'),
                     register_state='0'
-                )
-                newInvite.save()
+                    )
+                try:
+                    newInvite.save()
+                except:
+                    return HttpResponse("can not invite same people twice")###############error page!
     username=request.user.username            
     questions = Question.objects.filter(event=event)
 
-    guest = RegisterEvent.objects.filter(event=event,identity=2)
+    guest = RegisterEvent.objects.filter(event=event,identity='2')
     guestPending = guest.filter(register_state=0)
     guestPass = guest.filter(register_state=1)
     guestNum = guestPass.count()
 
-    owner = RegisterEvent.objects.filter(event=event,identity=0)
+    owner = RegisterEvent.objects.filter(event=event,identity='0')
     ownerPending = owner.filter(register_state=0)
     ownerPass = owner.filter(register_state=1)
     ownerNum = ownerPass.count()
 
-    vendor = RegisterEvent.objects.filter(event=event,identity=1)
+    vendor = RegisterEvent.objects.filter(event=event,identity='1')
     vendorPending = vendor.filter(register_state=0)
     vendorPass = vendor.filter(register_state=1)
     vendorNum = vendorPass.count()

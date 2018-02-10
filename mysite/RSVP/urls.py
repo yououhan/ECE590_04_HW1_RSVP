@@ -14,7 +14,7 @@ urlpatterns = [
     
     path('event_create/', views.event_create, name='event create'),    
    
-    path('event/<int:event_id>/', views.events_list, name='events_list'),
+    path('event/<int:event_id>/', views.events_list, name='event detail'),
     # access to owner and vender but have different view
     path('event/<int:event_id>/questionPage/',views.questionPageCreate,name='questionPageCreate'),
     # for new question create, only access to owner
@@ -24,7 +24,7 @@ urlpatterns = [
     # access to owner and vender, but vender can only view limit question
 #    path('event/<int:event_id>/questionStatistics/',views.questionStatistics,name='questionStatistics'),
     # for vender use will mergo the the event/<int:event_id> page soon
-    path('event/<int:event_id>/questionAnswer/',views.questionAnswer,name='questionAnswer'),
+    path('event/<int:event_id>/questionAnswer/',views.questionAnswer,name='question answer'),
     # for guest to answer question only access to guest
 
     path('sign_in', views.sign_in, name='sign_in'),
