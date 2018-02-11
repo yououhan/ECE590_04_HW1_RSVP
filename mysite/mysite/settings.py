@@ -31,7 +31,6 @@ ALLOWED_HOSTS = ['oy5','vcm-2827.vm.duke.edu','yl475','vcm-3030.vm.duke.edu']
 # Application definition
 
 INSTALLED_APPS = [
-    'bootstrap3',
     'RSVP.apps.RsvpConfig',
     'django.contrib.admin',
     'django.contrib.auth',
