@@ -1,4 +1,5 @@
 import django
+from django.contrib import messages
 from django.conf import settings
 from django.shortcuts import get_object_or_404, render,redirect
 from .models import Event,RegisterEvent,Question, Choice, MultiChoicesResponse, TextResponse
@@ -24,7 +25,7 @@ def questionView(request,event_id,guest_id):
     user = request.user
     guest = get_object_or_404(User,pk = guest_id)
     if not isGuest(guest,event):
-        return HttpResponse('no such guest in the event')
+        return render(request,'RSVP/errorPage.html',{'username':user})
     if isVendor(user,event):
         return viewAnswer(request,event,guest,False)
     if isOwner(user,event):
@@ -285,18 +286,20 @@ def event_info_owner(request, event):
                 new_userName = inviteNewUserForm.cleaned_data.get('username')
                 try:
                     new_user=User.objects.get(username=new_userName)
-                except:
-                    return HttpResponse(new_userName + " does not exist")###############error page!                   
-                newInvite=RegisterEvent(
-                    event=event,
-                    user = new_user,
-                    identity= request.POST.get('invite'),
-                    register_state='0'
+                    newInvite=RegisterEvent(
+                        event=event,
+                        user = new_user,
+                        identity= request.POST.get('invite'),
+                        register_state='0'
                     )
-                try:
-                    newInvite.save()
+                    try:
+                        newInvite.save()
+                    except:
+                        messages.error(request, "Can not invite same people twice")
                 except:
-                    return HttpResponse("can not invite same people twice")###############error page!
+                    new_user = None
+                    messages.error(request, new_userName + " does not exist")
+#                    return HttpResponse("messages")###############error page!                   !
     username=request.user.username            
     questions = Question.objects.filter(event=event)
 
@@ -333,6 +336,7 @@ def event_info_owner(request, event):
         'timeNow':timezone.now(),
         'username':username,
         'inviteNewUserform':inviteNewUserForm,
+#        'messages': messages,
     })
 
 

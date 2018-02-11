@@ -3,6 +3,15 @@
 {% block title %}Event Details{% endblock %}
 
 {% block content %}
+{% if messages %}
+<ul class="messages">
+  {% for message in messages %}
+  <script>
+  alert('{{ message }}');
+  </script>
+  {% endfor %}
+</ul>
+{% endif %}
 
 <!--the event name and time!!!!!!!!!!!!!!!!!!!!!!!-->
 <div class="container">
