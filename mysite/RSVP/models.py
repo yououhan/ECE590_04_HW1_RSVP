@@ -78,9 +78,9 @@ class Question(models.Model):
     question_text = models.CharField(max_length = QUESTION_TEXT_MAX_LENGTH)
     question_type = models.CharField(max_length = 1, choices = QUESTION_TYPES_CHOICES)
     isEditable = models.BooleanField(default = True)
-    isOptional = models.BooleanField(default = False)
+    isOptional = models.BooleanField('Is this a required question?', default = False)
     last_updated_time = models.DateTimeField('last updated time', auto_now = True)
-    isVisible = models.BooleanField(default = True)
+    isVisible = models.BooleanField('Are vendors allowed to view this question?', default = True)
     def __str__(self):
         return self.question_text
     # choices = ArrayField(

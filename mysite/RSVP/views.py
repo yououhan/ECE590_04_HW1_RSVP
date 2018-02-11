@@ -351,7 +351,7 @@ def event_create(request):
                                    register_state ='1'#register the creator as the owner of the event
             )
             register.save()
-            return redirect('../home')
+            return redirect('home')
     else:
         form = EventForm()
     return render(request,'RSVP/event_create.html',{
@@ -536,7 +536,7 @@ def signup(request):
             if user is not None:
                 if user.is_active:
                     login(request, user)
-                    return redirect('../../home')
+                    return redirect('home')
                 else:
                     return HttpResponse("this user is not active")
             else:
@@ -545,9 +545,6 @@ def signup(request):
         form = UserCreationForm()
     return render(request, 'RSVP/signup.html', {'form': form})
 
-def test(request):
-    return HttpResponse("Hello, world. You're " + request.user.username)
-from django.contrib.auth import logout
 def logout_view(request):
     logout(request)
     return redirect('/RSVP')

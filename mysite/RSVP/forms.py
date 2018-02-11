@@ -18,7 +18,7 @@ class EventForm(ModelForm):
 class Questionform(ModelForm):
     class Meta:
         model = Question
-        fields = ['question_text', 'question_type', 'isEditable', 'isOptional','isVisible']
+        fields = ['question_text', 'question_type', 'isOptional','isVisible']
 #        widgets = {'question_text' : forms.TextInput(attrs={'placeholder': '11111'})}
                 
 class Choiceform(ModelForm):
