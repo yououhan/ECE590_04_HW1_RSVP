@@ -12,11 +12,11 @@ urlpatterns = [
     path(r'signup/', views.signup, name = 'signup'),
     path('home/', views.home, name='home'),
     path('event_create/', views.event_create, name='event create'),       
-    path('event/<int:event_id>/', views.events_list, name='event detail'),
+    path('event/<int:event_id>/', views.event_info, name='event detail'),
     # access to owner and vender but have different view
-    path('event/<int:event_id>/questionPage/',views.questionPageCreate,name='questionPageCreate'),
+    path('event/<int:event_id>/question/',views.questionCreate,name='question create'),
     # for new question create, only access to owner
-    path('event/<int:event_id>/questionPage/<int:question_id>/',views.questionPageEdit,name='questionPageEdit'),
+    path('event/<int:event_id>/question/<int:question_id>/',views.questionEdit,name='question edit'),
     # for question edit and add choive, only access to owner 
     path('event/<int:event_id>/questionView/<int:guest_id>',views.questionView,name='questionView'),
     # access to owner and vender, but vender can only view limit question

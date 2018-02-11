@@ -17,7 +17,7 @@ from django.core.exceptions import ObjectDoesNotExist
 
 
 class QuestionWithResponse:
-    #this class is used to create the questionPage
+    #this class is used to create the question
     #with an array of this QuestionWithResponse it is easy to display
     def __init__(self, question, choices, response):
         self.question = question
@@ -230,8 +230,8 @@ class QuestionStatistics:
         self.text_answers = text_answers
 
 
-def questionPageCreate(request,event_id):
-    # this function is the main function of the url:event/<int:event_id>/questionPage/
+def questionCreate(request,event_id):
+    # this function is the main function of the url:event/<int:event_id>/question/
     # it would creat and save a new question for a event
     user = request.user
     event = get_object_or_404(Event,pk = event_id)
@@ -247,35 +247,35 @@ def questionPageCreate(request,event_id):
             return redirect('./' + str(question.id))
     else:
         QuestionForm = Questionform()
-    return render(request,'RSVP/questionPage.html',{
+    return render(request,'RSVP/question.html',{
         'Questionform': QuestionForm,
         'isCreate':'1',
         'username':user
     })
         
     
-def questionPageEdit(request, event_id, question_id):
-    # this function is the main fuction of the url:event/<int:event_id>/questionPage/<int:question_id>/
+def questionEdit(request, event_id, question_id):
+    # this function is the main fuction of the url:event/<int:event_id>/question/<int:question_id>/
     # it would update the question text or add or delete the choice of that question
     event = get_object_or_404(Event, pk=event_id)
     user = request.user
     question = get_object_or_404(Question,pk=question_id)
     if isOwner(user,event):
-        return questionPageEditOwner(request,question)
+        return questionEditOwner(request,question, event_id)
     return render(request,'RSVP/errorPage.html',{'username':user})
 
 
-def questionEdit(QuestionForm,question):
-    # this funciton is to edit a existed question
-    question_text = QuestionForm.cleaned_data['question_text']
-    question_type = QuestionForm.cleaned_data['question_type']
-    isEditable =  QuestionForm.cleaned_data['isEditable']
-    isOptional =  QuestionForm.cleaned_data['isOptional']
-    question.question_text = question_text
-    question.question_type = question_type
-    question.isEditable = isEditable
-    question.isOptional = isOptional
-    question.save()
+# def questionEdit(QuestionForm,question):
+#     # this funciton is to edit a existed question
+#     question_text = QuestionForm.cleaned_data['question_text']
+#     question_type = QuestionForm.cleaned_data['question_type']
+#     isEditable =  QuestionForm.cleaned_data['isEditable']
+#     isOptional =  QuestionForm.cleaned_data['isOptional']
+#     question.question_text = question_text
+#     question.question_type = question_type
+#     question.isEditable = isEditable
+#     question.isOptional = isOptional
+#     question.save()
 
 
 def addChoice(newChoiceForm,question):
@@ -305,8 +305,8 @@ def sentEmail(toBeDeleted,question):
         fail_silently=False,
     )
     
-def questionPageEditOwner(request,question):
-    # this function is called by the function questionPageEdit,
+def questionEditOwner(request,question, event_id):
+    # this function is called by the function questionEdit,
     # and should be accessed by the owner
     # it can help the owner to add or delete choice, change or delete question 
     choice = Choice.objects.filter(question=question)
@@ -314,7 +314,9 @@ def questionPageEditOwner(request,question):
         if request.POST.get('changeQuestion'):
             QuestionForm = Questionform(request.POST)
             if QuestionForm.is_valid():
-                questionEdit(QuestionForm,question)             
+                question = QuestionForm.save(commit = False)
+                question.event_id = event_id
+                #questionEdit(QuestionForm,question)             
         elif request.POST.get('add_choice'):
             newChoiceForm = newChoiceform(request.POST)
             if newChoiceForm.is_valid():
@@ -328,7 +330,7 @@ def questionPageEditOwner(request,question):
             return redirect('../../')
     newChoiceForm = newChoiceform()
     QuestionForm = Questionform(instance = question)
-    return render(request,'RSVP/questionPage.html',{
+    return render(request,'RSVP/question.html',{
         'newChoiceform':newChoiceForm,
         'Questionform': QuestionForm,
         'question':question,
@@ -403,16 +405,16 @@ def home(request):
     })
 
 
-def events_list(request,event_id):
+def event_info(request,event_id):
     # is function is the main funciton of the url:RSVP/event/<int:event_id>/
     # which can only be accessed by the vendor and owner
     # and call different funciton accordingly
     user = request.user
     event = get_object_or_404(Event,pk = event_id)
     if isOwner(user,event):
-        return events_list_owner(request,event)
+        return event_info_owner(request,event)
     elif isVendor(user,event):
-        return events_list_vender(request,event)
+        return event_info_vender(request,event)
     else:
         return render(request,'RSVP/errorPage.html',{'username':user})
     
@@ -433,8 +435,8 @@ def countStatistics(questions):
     return questionStatisticses
 
 
-def events_list_vender(request, event):
-    # this function is called by events_list, and can should only be accessed by vender
+def event_info_vender(request, event):
+    # this function is called by event_info, and can should only be accessed by vender
     # it would display all the guests and the statistic of all the questions the user have access
     if request.method == 'POST':
         toBeChangedQuestion = get_object_or_404(Question, pk=request.POST.get("finalize"))       
@@ -447,7 +449,7 @@ def events_list_vender(request, event):
     guestPass = guest.filter(register_state=1)
     guestNum = guestPass.count()
     questionStatisticses = countStatistics(questions)
-    return render(request, 'RSVP/events_list.html', {
+    return render(request, 'RSVP/event_info.html', {
         'event': event,
         'permission':'1',
         'event_name':event.event_name,
@@ -462,8 +464,8 @@ def events_list_vender(request, event):
 
 
     
-def events_list_owner(request, event):
-    # this function is called by events_list, and can should only be accessed by owner
+def event_info_owner(request, event):
+    # this function is called by event_info, and can should only be accessed by owner
     # it display all the list of owner vendor guest and question
     # it can help the owner add new question
     if request.method == 'POST':
@@ -504,7 +506,7 @@ def events_list_owner(request, event):
     vendorNum = vendorPass.count()
     inviteNewUserForm = inviteNewUserform()
     
-    return render(request, 'RSVP/events_list.html', {
+    return render(request, 'RSVP/event_info.html', {
         'event': event,
         'permission':'0',
         'event_name':event.event_name,
