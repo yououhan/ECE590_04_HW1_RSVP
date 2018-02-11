@@ -14,7 +14,6 @@ MULTICHOICES_RESPONSE_MAX_LENGTH = 30
 TEXT_RESPONSE_MAX_LENGTH = 500
 QUESTION_TYPES_CHOICES = (
     ('S', 'Single select'),
-#    ('M', 'Multiple select'),
     ('T', 'Text')
 )
 IDENTITY_CHOICES = (
@@ -29,20 +28,11 @@ REGISTER_STATE_CHOICES = (
     ('3', 'Declined and read')
 )
 
-# Create your models here.
-# class User(models.Model):
-#     username = models.CharField(max_length = USER_USERNAME_MAX_LENGTH, unique = True)
-#     name = models.CharField(max_length = USER_NAME_MAX_LENGTH)
-#     email = models.EmailField(null = True, unique = True)
-#     def __str__(self):
-#         return self.username
-
 class Event(models.Model):
     event_name = models.CharField('Event Name', max_length = EVENT_NAME_MAX_LENGTH)
     creator = models.ForeignKey(
         User,
         null = True,
-#        limit_choices_to = RegisterEvent(identity = '0'),
         on_delete=models.SET_NULL#Set the reference to NULL (requires the field to be nullable). For instance, when you delete a User, you might want to keep the comments he posted on blog posts, but say it was posted by an anonymous (or deleted) user.
     )
     event_time = models.DateTimeField('Event Time', default = timezone.now)
@@ -78,16 +68,11 @@ class Question(models.Model):
     question_text = models.CharField(max_length = QUESTION_TEXT_MAX_LENGTH)
     question_type = models.CharField(max_length = 1, choices = QUESTION_TYPES_CHOICES)
     isEditable = models.BooleanField(default = True)
-    isOptional = models.BooleanField('Is this a required question?', default = False)
+#    isOptional = models.BooleanField('Is this a required question?', default = False)
     last_updated_time = models.DateTimeField('last updated time', auto_now = True)
     isVisible = models.BooleanField('Are vendors allowed to view this question?', default = True)
     def __str__(self):
         return self.question_text
-    # choices = ArrayField(
-    #     models.CharField(max_length = CHOICE_TEXT_MAX_LENGTH, blank = True),
-    #     size = CHOICE_MAX_NUMBER,
-    #     null = True
-    #     )
         
 class Choice(models.Model):
     id = models.AutoField(primary_key=True)
@@ -114,7 +99,6 @@ class MultiChoicesResponse(models.Model):
         )
     class Meta:
         unique_together = (("question", "register_event", "is_plus_one"),)
-    #answer = models.CharField(max_length = MULTICHOICES_RESPONSE_MAX_LENGTH)
     answer = models.ForeignKey(
         Choice,
         on_delete=models.CASCADE
@@ -143,25 +127,25 @@ class TextResponse(models.Model):
     def __str__(self):
         return '%s reponsed to %s' % (self.register_event.user, self.question.question_text)
 
-class EventAccess(models.Model):
-    registerEvent = models.ForeignKey(
-        RegisterEvent,
-        on_delete=models.CASCADE#Must be vendor, if the identity is changed, need to manually delte!!!!!!!
-        )
-    guestNumberIsVisible = models.BooleanField()
-    guestListIsVisible = models.BooleanField()
-    def __str__(self):
-        return '%s access of %s' % (self.registerEvent.user.username, self.registerEvent.event.event_name)
+# class EventAccess(models.Model):
+#     registerEvent = models.ForeignKey(
+#         RegisterEvent,
+#         on_delete=models.CASCADE#Must be vendor, if the identity is changed, need to manually delte!!!!!!!
+#         )
+#     guestNumberIsVisible = models.BooleanField()
+#     guestListIsVisible = models.BooleanField()
+#     def __str__(self):
+#         return '%s access of %s' % (self.registerEvent.user.username, self.registerEvent.event.event_name)
 
-class QuestionAccess(models.Model):
-    registerEvent = models.ForeignKey(
-        RegisterEvent,
-        on_delete=models.CASCADE#Must be vendor, if the identity is changed, need to manually delte!!!!!!!
-        )
-    question = models.ForeignKey(
-        Question,
-        on_delete=models.CASCADE
-        )
-    access = models.BooleanField()
-    def __str__(self):
-        return '%s question access of %s' % (self.registerEvent.user.username, self.registerEvent.event.event_name)
+# class QuestionAccess(models.Model):
+#     registerEvent = models.ForeignKey(
+#         RegisterEvent,
+#         on_delete=models.CASCADE#Must be vendor, if the identity is changed, need to manually delte!!!!!!!
+#         )
+#     question = models.ForeignKey(
+#         Question,
+#         on_delete=models.CASCADE
+#         )
+#     access = models.BooleanField()
+#     def __str__(self):
+#         return '%s question access of %s' % (self.registerEvent.user.username, self.registerEvent.event.event_name)

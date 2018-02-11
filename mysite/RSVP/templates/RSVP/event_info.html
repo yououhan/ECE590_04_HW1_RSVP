@@ -1,124 +1,119 @@
 {% extends "RSVP/navbar.html" %}
 
-{% block title %}event details{% endblock %}
+{% block title %}Event Details{% endblock %}
 
 {% block content %}
 
-    <!--the event name and time!!!!!!!!!!!!!!!!!!!!!!!-->
-    <div class="container">
-      <div class="row">
-	<!--      <form action="/admin" method="post">-->
-	<div class="col-md-12 mb-3">
-	  <h3>{{event.event_name}} </h3>
-	</div>
-	<div class="col-md-12 mb-3">
-	  <h3>{{event.event_time}}</h3>
-	</div>
-	{% if permission == '0'%}
-	<form method="post" action="">
-	  {%csrf_token%}
-	  <div class="col-md-4 mb-3">
-	    <button type="submit" class="btn btn-danger" name="delete_event" value="{{event.id}}" type="submit">delete this event</button>
-	  </div>
-	</form>
-	{% endif %}
+<!--the event name and time!!!!!!!!!!!!!!!!!!!!!!!-->
+<div class="container">
+  <div class="row">
+    <!--      <form action="/admin" method="post">-->
+    <div class="col-md-12 mb-3">
+      <h3>{{event.event_name}} </h3>
+    </div>
+    <div class="col-md-12 mb-3">
+      <h3>{{event.event_time}}</h3>
+    </div>
+    {% if permission == '0'%}
+    <form method="post" action="">
+      {%csrf_token%}
+      <div class="col-md-4 mb-3">
+	<button type="submit" class="btn btn-danger" name="delete_event" value="{{event.id}}" type="submit">delete this event</button>
       </div>
-      <hr>
+    </form>
+    {% endif %}
+  </div>
+  <hr>
 
-      <!--the guestInfo-->
-      <div class="mb-3">
-	<h2>GuestInfo</h2>
-	<h3>
-      	  <span>{{guestNum}}</span> guests will attend your <span>{{event_name}}</span>
-	</h3>
-	<div class="bd-example">
+  <!--the guestInfo-->
+  <div class="mb-3">
+    <h2>GuestInfo</h2>
+    <h3>
+      <span>{{guestNum}}</span> guests will attend your <span>{{event_name}}</span>
+    </h3>
+    <div class="bd-example">
 
-	  <div class="dropdown">
-  	    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    	      Guets list
-  	    </button>
-  	    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-	      {% for people in guestPass %}
-    	      <a class="dropdown-item" href="./questionView/{{people.user.id}}">{{people.user}}</a>
-	      {% endfor %}
-	    </div>  
-	    <div class="btn-group">
-	      <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-		Pending guests
-	      </button>
-	      <div class="dropdown-menu">
-		{% for people in guestPending %}
-		<a class="dropdown-item" href="#">{{people.user}}</a>
-		{% endfor %}
-	      </div>
-	    </div>
+      <div class="dropdown">
+  	<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    	  Guets list
+  	</button>
+  	<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+	  {% for people in guestPass %}
+    	  <a class="dropdown-item" href="./questionView/{{people.user.id}}">{{people.user}}</a>
+	  {% endfor %}
+	</div>  
+	<div class="btn-group">
+	  <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+	    Pending guests
+	  </button>
+	  <div class="dropdown-menu">
+	    {% for people in guestPending %}
+	    <a class="dropdown-item" href="#">{{people.user}}</a>
+	    {% endfor %}
+	  </div>
+	</div>
 
 	{% if permission == '0'%}
 
-	    <div style="width:30%">
-	      <form action="" method="post">
-		{%csrf_token%}
-		{% for error in form.non_field_errors %}
-	      <div class="form-group has-errors text-danger small">
-		{{error}}
-	      </div>
-	      {% endfor %}
-	      {% for field in inviteNewUserform %}
-	      <div class="form-group has-errors text-danger small">
-		{{field.errors}}
-	      </div>
-	      <div class="form-group has-errors text-danger small">
-	      </div>
-	      <div class="form-group">
-		{{field.label}}
-		{{field}}
-	      </div>
-	      {% endfor %}
-	      <button class="btn btn-primary" style="width:100%" name="invite" value="2">invite new guest</button>
-	      </form>
+	<div style="width:30%">
+	  <form action="" method="post">
+	    {%csrf_token%}
+	    {% for error in form.non_field_errors %}
+	    <div class="form-group has-errors text-danger small">
+	      {{error}}
 	    </div>
-	    
-
-
-	  </div>
+	    {% endfor %}
+	    {% for field in inviteNewUserform %}
+	    <div class="form-group has-errors text-danger small">
+	      {{field.errors}}
+	    </div>
+	    <div class="form-group has-errors text-danger small">
+	    </div>
+	    <div class="form-group">
+	      {{field.label}}
+	      {{field}}
+	    </div>
+	    {% endfor %}
+	    <button class="btn btn-primary" style="width:100%" name="invite" value="2">invite new guest</button>
+	  </form>
 	</div>
-	<hr>
+      </div>
+    </div>
+    <hr>
 
-	<!--the vendor Info-->
-	<div class="mb-3">
-	  <h2>vendorInfo</h2>
-	  <h3>
-            <span>{{vendorNum}}</span> vendor will attend your <span>{{event_name}}</span>
-	  </h3>
-	  <div class="bd-example">
+    <!--the vendor Info-->
+    <div class="mb-3">
+      <h2>vendorInfo</h2>
+      <h3>
+        <span>{{vendorNum}}</span> vendor will attend your <span>{{event_name}}</span>
+      </h3>
+      <div class="bd-example">
 
-	    <div class="dropdown">
-	      <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-		vendor list
-	      </button>
-	      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-		{% for people in vendorPass %}
-		<a class="dropdown-item" href="#">{{people.user}}</a>
-		{% endfor %}
-	      </div>
+	<div class="dropdown">
+	  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+	    vendor list
+	  </button>
+	  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+	    {% for people in vendorPass %}
+	    <a class="dropdown-item" href="#">{{people.user}}</a>
+	    {% endfor %}
+	  </div>
 
-	      <div class="btn-group">
-		<button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-		  Pending vendor
-		</button>
-		<div class="dropdown-menu">
-		  {% for people in vendorPending %}
-		  <a class="dropdown-item" href="#">{{people.user}}</a>
-		  {% endfor %}
-		</div>
-	      </div>
+	  <div class="btn-group">
+	    <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+	      Pending vendor
+	    </button>
+	    <div class="dropdown-menu">
+	      {% for people in vendorPending %}
+	      <a class="dropdown-item" href="#">{{people.user}}</a>
+	      {% endfor %}
+	    </div>
+	  </div>
 
-
-
-	    <div style="width:30%">
-	      <form action="" method="post">
-		{%csrf_token%}
-		{% for error in form.non_field_errors %}
+	  <div style="width:30%">
+	    <form action="" method="post">
+	      {%csrf_token%}
+	      {% for error in form.non_field_errors %}
 	      <div class="form-group has-errors text-danger small">
 		{{error}}
 	      </div>
@@ -135,110 +130,88 @@
 	      </div>
 	      {% endfor %}
 	      <button class="btn btn-primary" style="width:100%" name="invite" value="1">invite new vendor</button>
-	      </form>
-	    </div>
-	      
-
-	    </div>
+	    </form>
 	  </div>
-	  <hr>
+	</div>
+      </div>
+      <hr>
 
+      <!--the vendorInfo-->
+      <div class="mb-3">
+	<h2>OwnerInfo</h2>
+	<h3>
+          <span>{{ownerNum}}</span> owner will attend your <span>{{event_name}}</span>
+	</h3>
+	<div class="bd-example">	  
+	  <div class="dropdown">
+	    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+	      Owner list
+	    </button>
+	    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+	      {% for people in ownerPass %}
+	      <a class="dropdown-item" href="#">{{people.user}}</a>
+	      {% endfor %}
+	    </div>
 
-	  <!--the vendorInfo-->
-	  <div class="mb-3">
-	    <h2>OwnerInfo</h2>
-	    <h3>
-              <span>{{ownerNum}}</span> owner will attend your <span>{{event_name}}</span>
-	    </h3>
-	    <div class="bd-example">
-
-	      
-	      <div class="dropdown">
-		<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-		  Owner list
-		</button>
-		<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-		  {% for people in ownerPass %}
-		  <a class="dropdown-item" href="#">{{people.user}}</a>
-		  {% endfor %}
-		</div>
-
-		<div class="btn-group">
-		  <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-		    Pending owner
-		  </button>
-		  <div class="dropdown-menu">
-		    {% for people in ownerPending %}
-		    <a class="dropdown-item" href="#">{{people.user}}</a>
-		    {% endfor %}
-		  </div>
-		</div>
+	    <div class="btn-group">
+	      <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+		Pending owner
+	      </button>
+	      <div class="dropdown-menu">
+		{% for people in ownerPending %}
+		<a class="dropdown-item" href="#">{{people.user}}</a>
+		{% endfor %}
+	      </div>
+	    </div>
 	    <div style="width:30%">
 	      <form action="" method="post">
 		{%csrf_token%}
 		{% for error in form.non_field_errors %}
-	      <div class="form-group has-errors text-danger small">
-		{{error}}
-	      </div>
-	      {% endfor %}
-	      {% for field in inviteNewUserform %}
-	      <div class="form-group has-errors text-danger small">
-		{{field.errors}}
-	      </div>
-	      <div class="form-group has-errors text-danger small">
-	      </div>
-	      <div class="form-group">
-		{{field.label}}
-		{{field}}
-	      </div>
-	      {% endfor %}
-	      <button class="btn btn-primary" style="width:100%" name="invite" value="0">invite new owner</button>
+		<div class="form-group has-errors text-danger small">
+		  {{error}}
+		</div>
+		{% endfor %}
+		{% for field in inviteNewUserform %}
+		<div class="form-group has-errors text-danger small">
+		  {{field.errors}}
+		</div>
+		<div class="form-group has-errors text-danger small">
+		</div>
+		<div class="form-group">
+		  {{field.label}}
+		  {{field}}
+		</div>
+		{% endfor %}
+		<button class="btn btn-primary" style="width:100%" name="invite" value="0">invite new owner</button>
 	      </form>
 	    </div>
 
-	      </div>
-	    </div>
-	    <hr>
-	    <div>
-	      <h2>Question</h2>
-	    </div>
-	    <div class="dropdown">
-  	      <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    		Question list
-  	      </button>
-  	      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-		{% for question in questions %}
-		<a class="dropdown-item" href="{% url 'question edit' event.id question.id %}">{{question.question_text}}</a>
-		{% endfor %}
-	      </div>
-	      <button type="button" class="btn btn-primary"
-		      onclick="location=' {% url 'question create' event.id  %}'">
- 		add new 
-	      </button>
-	    </div>
 	  </div>
-	  {% endif%}
+	</div>
+	<hr>
+	<div>
+	  <h2>Question</h2>
+	</div>
+	<div class="dropdown">
+  	  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    	    Question list
+  	  </button>
+  	  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+	    {% for question in questions %}
+	    <a class="dropdown-item" href="{% url 'question edit' event.id question.id %}">{{question.question_text}}</a>
+	    {% endfor %}
+	  </div>
+	  <button type="button" class="btn btn-primary"
+		  onclick="location=' {% url 'question create' event.id  %}'">
+ 	    add new 
+	  </button>
+	</div>
+      </div>
+      {% endif%}
 
-	  {% if permission == '1'%}
-	  <hr>
-	  <h2>statistic</h2>
-  <!-- 	  <form action="" method="post"> -->
-  <!-- 	    {%csrf_token%} -->
-  <!-- 	    {% for questionStatistics in questionStatisticses %} -->
-  <!-- 	    {{questionStatistics.question.question_text}} -->
-  <!-- 	    isEditable = {{questionStatistics.question.isEditable}} -->
-  <!-- 	    <button class="btn btn-danger" style="width:20%" type="submit" name="finalize" value="{{questionStatistics.question.id}}">Toggle Finalization State</button> -->
-  <!-- 	    {% if questionStatistics.question.question_type == 'S' %} -->
-  <!-- 	    {% for choiceCount in  questionStatistics.choiceCounts %} -->
-  <!-- 	    <p>{{choiceCount.choice}} Total Count:{{choiceCount.count}}</p> -->
-  <!-- 	    {% endfor %} -->
-  <!-- 	    {% elif questionStatistics.question.question_type == 'T' %} -->
-  <!-- {% for text_answer in questionStatistics.text_answers %} -->
-  <!-- 	    <p>{{text_answer.answer}}</p> -->
-  <!-- 	    {% endfor %} -->
-  <!-- 	    {% endif %} -->
-  <!-- 	    {% endfor %} -->
-  <!-- 	  </form> -->
+      {% if permission == '1'%}
+      <hr>
+      <h2>statistic</h2>
       <h1>Question Response Statistics</h1>
       <div style="width:100%">
 	<form action="" method="post">
@@ -249,34 +222,32 @@
 	    <li class="list-group-item list-group-item-primary">
 	      <div style="line-height:2.5em;display:inline-block;width:85%"> Question:&nbsp;&nbsp;&nbsp;{{questionStatistics.question.question_text}}</div>
 	      {% if questionStatistics.question.isEditable %}
-	     <button class="btn btn-danger float-right" type="submit" name="finalize" value="{{questionStatistics.question.id}}" style="height:2.5em;">Finalize</button>	
+	      <button class="btn btn-danger float-right" type="submit" name="finalize" value="{{questionStatistics.question.id}}" style="height:2.5em;">Finalize</button>	
 	      {% else %}
 	      <button class="btn btn-info float-right" type="submit" name="finalize" value="{{questionStatistics.question.id}}" style="height:2.5em;">Unfinalize</button>	
 	      {% endif %}
-	      </div>
-	    </li>
-
-	    </div>
-	    <div class="container-fluid">
-	    {% if questionStatistics.question.question_type == 'S' %}
-	      <ul class="list-group list-group-flush">
-		{% for choiceCount in  questionStatistics.choiceCounts %}
-		<li class="list-group-item">Choice {{forloop.counter}}: {{choiceCount.choice}} <span class="float-right">Total Count: {{choiceCount.count}}</span></li>
-		{% endfor %}
-	      </ul>
-	    {% elif questionStatistics.question.question_type == 'T' %}
-	      <ul class="list-group list-group-flush">
-	      {% for text_answer in questionStatistics.text_answers %}
-	      <li class="list-group-item">{{text_answer.answer}}</li>
-	      {% endfor %}
-	    </ul>
-	    {% endif %}
-	    </div>
-	    {% endfor %}
-	  </ul>
-	</form>
       </div>
-	  {% endif%}
+</li>
 
-
+</div>
+<div class="container-fluid">
+  {% if questionStatistics.question.question_type == 'S' %}
+  <ul class="list-group list-group-flush">
+    {% for choiceCount in  questionStatistics.choiceCounts %}
+    <li class="list-group-item">Choice {{forloop.counter}}: {{choiceCount.choice}} <span class="float-right">Total Count: {{choiceCount.count}}</span></li>
+    {% endfor %}
+  </ul>
+  {% elif questionStatistics.question.question_type == 'T' %}
+  <ul class="list-group list-group-flush">
+    {% for text_answer in questionStatistics.text_answers %}
+    <li class="list-group-item">{{text_answer.answer}}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</div>
+{% endfor %}
+</ul>
+</form>
+</div>
+{% endif%}
 {% endblock%}

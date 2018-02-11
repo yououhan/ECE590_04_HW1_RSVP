@@ -1,97 +1,94 @@
 {% extends "RSVP/navbar.html" %}
 
-{% block title %}event details{% endblock %}
+{% block title %}Question Answering{% endblock %}
 
 {% block content %}
 
 
 <!-- question here -->
-    <div class="container">
-      <form method="post" action="">
-	<h1>Questions for guests</h1>
-	{% if event.plus_one_permissible %}
-	<div class="text-center" style="margin-bottom:20px">
-	  {% if showPlusOneQuestions %}
-	  <button class="btn btn-success" style="width:30%" type="submit" name="toggleAPlusOne" value="setFalse">Cancel a Plus One</button>
-	  {% else %}
-	  <button class="btn btn-success" style="width:30%" type="submit" name="toggleAPlusOne" value="setTrue">Bring a Plus One</button>
-	  {% endif %}
-	</div>
-	{% endif %}
-	<div style="width:100%">
-	  {%csrf_token%}
-	  <ul class="list-group">
-	    {% for questionWithResponse in questionWithResponses%}
-	    <li class="list-group-item list-group-item-primary" style="margin-bottom:1px;">Question: {{questionWithResponse.question.question_text}}
-	    </li>
-	    {% if questionWithResponse.choices.count > 0 %}
-	    <div class="custom-control custom-radio container-fluid">
-	      <ul class="list-group list-group-flush">
-		{% for choice in questionWithResponse.choices%}
-		<li class="list-group-item">
-		  {% if choice.id == questionWithResponse.response.answer.id %}    
-		  <input type="radio" name="{{questionWithResponse.question.id}}" checked="checked" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
-		  {% else %}
-		  <input type="radio" name="{{questionWithResponse.question.id}}" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
-		  {% endif %}
-		  <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label>
-		</li>
-		{% endfor %}
-	      </ul>
-	    </div>
-	    {% else %}
-	    <textarea class="form-control" rows="3" name="{{questionWithResponse.question.id}}">{{questionWithResponse.response.answer}}</textarea>
-	    {% endif %}
-	    {% endfor %}
-	  </ul>
-	</div>
-	{% if noSubmit == False%}
-	<div class="text-center" style="margin-top:30px">
-	  <button class="btn btn-primary" style="width:20%" type="submit" name="submit" value="guest">Submit</button>
-	</div>
-	{% endif%}
-      </form>
-      
-<!--plueone-->
-{% if event.plus_one_permissible %}
-
-      {% if showPlusOneQuestions%}
-      <form method="post" action="">
-	{%csrf_token%}
-	<h1>questions for plus one</h1>
-	<div style="width:100%">
-	  <ul class="list-group">
-	    {% for questionWithPlusOneResponse in questionWithPlusOneResponses%}
-	    <li class="list-group-item list-group-item-primary" style="margin-bottom:1px;">Question: {{questionWithPlusOneResponse.question.question_text}}
-	    </li>
-	    {% if questionWithPlusOneResponse.choices.count > 0 %}
-	    <div class="custom-control custom-radio container-fluid">
-	      <ul class="list-group list-group-flush">
-		{% for choice in questionWithPlusOneResponse.choices%}
-		<li class="list-group-item">
-		  {% if choice.id == questionWithPlusOneResponse.response.answer.id %}    
-		  <input type="radio" name="plus_one_{{questionWithPlusOneResponse.question.id}}" checked="checked" id="plus_one_choice{{ forloop.counter }}" value="{{ choice.id }}">
-		  {% else %}
-		  <input type="radio" name="plus_one_{{questionWithPlusOneResponse.question.id}}" id="plus_one_choice{{ forloop.counter }}" value="{{ choice.id }}">
-		  {% endif %}
-		  <label for="plus_one_choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br>
-		</li>
-		{% endfor %}
-	      </ul>
-	    </div>
-	    {% else %}
-	    <textarea class="form-control" rows="3" name="plus_one_{{questionWithPlusOneResponse.question.id}}">{{questionWithPlusOneResponse.response.answer}}</textarea>
-	    {% endif %}
-	    {% endfor %}
-	  </ul>
-	  {% if noSubmit == False%}
-	  <div class="text-center" style="margin-top:30px">
-	    <button class="btn btn-primary" style="width:20%" type="submit" name="submit" value="plusOne">Submit</button>
-	  </div>
-	  {% endif%}
-	  {% endif %}
-	</div>
-      </form>
- {% endif%}
+<div class="container">
+  <form method="post" action="">
+    <h1>Questions for guests</h1>
+    {% if event.plus_one_permissible %}
+    <div class="text-center" style="margin-bottom:20px">
+      {% if showPlusOneQuestions %}
+      <button class="btn btn-success" style="width:30%" type="submit" name="toggleAPlusOne" value="setFalse">Cancel a Plus One</button>
+      {% else %}
+      <button class="btn btn-success" style="width:30%" type="submit" name="toggleAPlusOne" value="setTrue">Bring a Plus One</button>
+      {% endif %}
     </div>
+    {% endif %}
+    <div style="width:100%">
+      {%csrf_token%}
+      <ul class="list-group">
+	{% for questionWithResponse in questionWithResponses%}
+	<li class="list-group-item list-group-item-primary" style="margin-bottom:1px;">Question: {{questionWithResponse.question.question_text}}
+	</li>
+	{% if questionWithResponse.choices.count > 0 %}
+	<div class="custom-control custom-radio container-fluid">
+	  <ul class="list-group list-group-flush">
+	    {% for choice in questionWithResponse.choices%}
+	    <li class="list-group-item">
+	      {% if choice.id == questionWithResponse.response.answer.id %}    
+	      <input type="radio" name="{{questionWithResponse.question.id}}" checked="checked" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
+	      {% else %}
+	      <input type="radio" name="{{questionWithResponse.question.id}}" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
+	      {% endif %}
+	      <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label>
+	    </li>
+	    {% endfor %}
+	  </ul>
+	</div>
+	{% else %}
+	<textarea class="form-control" rows="3" name="{{questionWithResponse.question.id}}">{{questionWithResponse.response.answer}}</textarea>
+	{% endif %}
+	{% endfor %}
+      </ul>
+    </div>
+    {% if noSubmit == False%}
+    <div class="text-center" style="margin-top:30px">
+      <button class="btn btn-primary" style="width:20%" type="submit" name="submit" value="guest">Submit</button>
+    </div>
+    {% endif%}
+  </form>
+  
+  <!--plueone-->
+  {% if showPlusOneQuestions%}
+  <form method="post" action="">
+    {%csrf_token%}
+    <h1>questions for plus one</h1>
+    <div style="width:100%">
+      <ul class="list-group">
+	{% for questionWithPlusOneResponse in questionWithPlusOneResponses%}
+	<li class="list-group-item list-group-item-primary" style="margin-bottom:1px;">Question: {{questionWithPlusOneResponse.question.question_text}}
+	</li>
+	{% if questionWithPlusOneResponse.choices.count > 0 %}
+	<div class="custom-control custom-radio container-fluid">
+	  <ul class="list-group list-group-flush">
+	    {% for choice in questionWithPlusOneResponse.choices%}
+	    <li class="list-group-item">
+	      {% if choice.id == questionWithPlusOneResponse.response.answer.id %}    
+	      <input type="radio" name="plus_one_{{questionWithPlusOneResponse.question.id}}" checked="checked" id="plus_one_choice{{ forloop.counter }}" value="{{ choice.id }}">
+	      {% else %}
+	      <input type="radio" name="plus_one_{{questionWithPlusOneResponse.question.id}}" id="plus_one_choice{{ forloop.counter }}" value="{{ choice.id }}">
+	      {% endif %}
+	      <label for="plus_one_choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br>
+	    </li>
+	    {% endfor %}
+	  </ul>
+	</div>
+	{% else %}
+	<textarea class="form-control" rows="3" name="plus_one_{{questionWithPlusOneResponse.question.id}}">{{questionWithPlusOneResponse.response.answer}}</textarea>
+	{% endif %}
+	{% endfor %}
+      </ul>
+      {% if noSubmit == False%}
+      <div class="text-center" style="margin-top:30px">
+	<button class="btn btn-primary" style="width:20%" type="submit" name="submit" value="plusOne">Submit</button>
+      </div>
+      {% endif%}
+      {% endif %}
+    </div>
+  </form>
+</div>
 {% endblock%}

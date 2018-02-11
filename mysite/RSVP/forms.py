@@ -10,7 +10,6 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 
 class EventForm(ModelForm):
-#    plusOne = forms.BooleanField(label='can guest +1?',required=False)    needs to write save function
     class Meta:
         model = Event
         fields = ['event_name', 'event_time', 'plus_one_permissible']
@@ -18,8 +17,7 @@ class EventForm(ModelForm):
 class Questionform(ModelForm):
     class Meta:
         model = Question
-        fields = ['question_text', 'question_type', 'isOptional','isVisible']
-#        widgets = {'question_text' : forms.TextInput(attrs={'placeholder': '11111'})}
+        fields = ['question_text', 'question_type', 'isVisible']
                 
 class Choiceform(ModelForm):
     class Meta:
@@ -28,8 +26,6 @@ class Choiceform(ModelForm):
 
 
 class UserCreationForm(UserCreationForm):
-#    email = EmailField(label=_("Email address"), required=True,
-#                       help_text=_("Required."))
     class Meta:
         model = User
         fields = ("username", "first_name", "last_name", "email", "password1", "password2")
@@ -37,12 +33,6 @@ class UserCreationForm(UserCreationForm):
         super(UserCreationForm, self).__init__(*args, **kwargs)
         for fieldname in ['username', 'password1', 'password2']:
             self.fields[fieldname].help_text = None
-    # def save(self, commit=True):
-    #     user = super(UserCreationForm, self).save(commit=False)
-    #     user.email = self.cleaned_data["email"]
-    #     if commit:
-    #         user.save()
-    #     return user
 
 class inviteNewUserform(forms.Form):
     username = forms.CharField(label='Invitee username', max_length=100)
