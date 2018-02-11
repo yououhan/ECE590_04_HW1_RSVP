@@ -7,7 +7,7 @@
 <ul class="messages">
   {% for message in messages %}
   <script>
-  alert('{{ message }}');
+    alert('{{ message }}');
   </script>
   {% endfor %}
 </ul>
@@ -57,7 +57,7 @@
 	  </button>
 	  <div class="dropdown-menu">
 	    {% for people in guestPending %}
-	    <a class="dropdown-item" href="#">{{people.user}}</a>
+	    <a class="dropdown-item">{{people.user}}</a>
 	    {% endfor %}
 	  </div>
 	</div>
@@ -83,7 +83,11 @@
 	      {{field}}
 	    </div>
 	    {% endfor %}
+	    {% if hasPast%}
+	    <button class="btn btn-primary" style="width:100%" name="invite" value="2" disabled>invite new guest</button>
+	    {% else %}
 	    <button class="btn btn-primary" style="width:100%" name="invite" value="2">invite new guest</button>
+	    {% endif %}
 	  </form>
 	</div>
       </div>
@@ -104,7 +108,7 @@
 	  </button>
 	  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
 	    {% for people in vendorPass %}
-	    <a class="dropdown-item" href="#">{{people.user}}</a>
+	    <a class="dropdown-item">{{people.user}}</a>
 	    {% endfor %}
 	  </div>
 
@@ -114,7 +118,7 @@
 	    </button>
 	    <div class="dropdown-menu">
 	      {% for people in vendorPending %}
-	      <a class="dropdown-item" href="#">{{people.user}}</a>
+	      <a class="dropdown-item">{{people.user}}</a>
 	      {% endfor %}
 	    </div>
 	  </div>
@@ -138,7 +142,11 @@
 		{{field}}
 	      </div>
 	      {% endfor %}
+	      {% if hasPast%}
+	      <button class="btn btn-primary" style="width:100%" name="invite" value="1" disabled>invite new vendor</button>
+	      {% else %}
 	      <button class="btn btn-primary" style="width:100%" name="invite" value="1">invite new vendor</button>
+	      {% endif %}
 	    </form>
 	  </div>
 	</div>
@@ -191,7 +199,11 @@
 		  {{field}}
 		</div>
 		{% endfor %}
+		{% if hasPast%}
+		<button class="btn btn-primary" style="width:100%" name="invite" value="0" disabled>invite new owner</button>
+		{% else %}
 		<button class="btn btn-primary" style="width:100%" name="invite" value="0">invite new owner</button>
+		{% endif %}
 	      </form>
 	    </div>
 
@@ -210,10 +222,12 @@
 	    <a class="dropdown-item" href="{% url 'question edit' event.id question.id %}">{{question.question_text}}</a>
 	    {% endfor %}
 	  </div>
+	  {% if not hasPast%}
 	  <button type="button" class="btn btn-primary"
-		  onclick="location=' {% url 'question create' event.id  %}'">
+		  onclick="location=' {% url 'question create' event.id  %}'" >
  	    add new 
 	  </button>
+	  {% endif %}
 	</div>
       </div>
       {% endif%}
@@ -226,14 +240,17 @@
 	<form action="" method="post">
 	  {%csrf_token%}
 	  <ul class="list-group">
-	    {% for questionStatistics in questionStatisticses %}
-	    
+	    {% for questionStatistics in questionStatisticses %}	    
 	    <li class="list-group-item list-group-item-primary">
 	      <div style="line-height:2.5em;display:inline-block;width:85%"> Question:&nbsp;&nbsp;&nbsp;{{questionStatistics.question.question_text}}</div>
 	      {% if questionStatistics.question.isEditable %}
-	      <button class="btn btn-danger float-right" type="submit" name="finalize" value="{{questionStatistics.question.id}}" style="height:2.5em;">Finalize</button>	
+	      {% if not hasPast%}
+	      <button class="btn btn-danger float-right" type="submit" name="finalize" value="{{questionStatistics.question.id}}" style="height:2.5em;">Finalize</button>
+	      {% endif %}
 	      {% else %}
-	      <button class="btn btn-info float-right" type="submit" name="finalize" value="{{questionStatistics.question.id}}" style="height:2.5em;">Unfinalize</button>	
+	      {% if not hasPast%}
+	      <button class="btn btn-danger float-right" type="submit" name="finalize" value="{{questionStatistics.question.id}}" style="height:2.5em;">Unfinalize</button>
+	      {% endif %}
 	      {% endif %}
       </div>
 </li>

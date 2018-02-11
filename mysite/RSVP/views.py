@@ -4,7 +4,6 @@ from django.conf import settings
 from django.shortcuts import get_object_or_404, render,redirect
 from .models import Event,RegisterEvent,Question, Choice, MultiChoicesResponse, TextResponse
 from django.contrib.auth import login, authenticate
-from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.contrib.auth import logout
@@ -65,8 +64,8 @@ def questionAnswer(request, event_id):
     # and if it is a POST it would create or update the response
     # if this event can bring a +1 it would show a button if clicked a new form would show
     # and guest can add a new response for the +1
-    event = get_object_or_404(Event, pk=event_id)
     user = request.user
+    event = get_object_or_404(Event,pk = event_id)
     if not isGuest(user,event):
         return render(request,'RSVP/errorPage.html',{'username':user})
     registerEvent = get_object_or_404(RegisterEvent, event=event, user=user, identity='2')
@@ -105,8 +104,9 @@ def questionAnswer(request, event_id):
         'textQuestions':textQuestions,
         'questionWithResponses': questionWithResponses,
         'questionWithPlusOneResponses': questionWithPlusOneResponses,
-        'noSubmit':False
-        })
+        'noSubmit':False,
+        'hasPast':timezone.now() > event.event_time,
+    })
 
 def questionCreate(request,event_id):
     # this function is the main function of the url:event/<int:event_id>/question/
@@ -139,10 +139,10 @@ def questionEdit(request, event_id, question_id):
     user = request.user
     question = get_object_or_404(Question,pk=question_id)
     if isOwner(user,event):
-        return questionEditOwner(request,question, event_id)
+        return questionEditOwner(request,question, event)
     return render(request,'RSVP/errorPage.html',{'username':user})
 
-def questionEditOwner(request,question, event_id):
+def questionEditOwner(request,question, event):
     # this function is called by the function questionEdit,
     # and should be accessed by the owner
     # it can help the owner to add or delete choice, change or delete question 
@@ -152,7 +152,8 @@ def questionEditOwner(request,question, event_id):
             QuestionForm = Questionform(request.POST)
             if QuestionForm.is_valid():
                 question = QuestionForm.save(commit = False)
-                question.event_id = event_id
+                question.event_id = event.id
+                return redirect('../../')
                 #questionEdit(QuestionForm,question)             
         elif request.POST.get('add_choice'):
             newChoiceForm = newChoiceform(request.POST)
@@ -172,7 +173,8 @@ def questionEditOwner(request,question, event_id):
         'Questionform': QuestionForm,
         'question':question,
         'choice':choice,
-        'username':request.user
+        'username':request.user,
+        'hasPast':timezone.now() > event.event_time,
     })
 
 def event_create(request):
@@ -267,7 +269,7 @@ def event_info_vender(request, event):
         'guestPass':guestPass,
         'guestNum':guestNum,
         'questions':questions,
-        'timeNow':timezone.now(),
+        'hasPast':timezone.now() > event.event_time,
         'username':username,
         'questionStatisticses': questionStatisticses
     })
@@ -299,7 +301,6 @@ def event_info_owner(request, event):
                 except:
                     new_user = None
                     messages.error(request, new_userName + " does not exist")
-#                    return HttpResponse("messages")###############error page!                   !
     username=request.user.username            
     questions = Question.objects.filter(event=event)
 
@@ -333,7 +334,7 @@ def event_info_owner(request, event):
         'vendorPass':vendorPass,
         'vendorNum':vendorNum,
         'questions':questions,
-        'timeNow':timezone.now(),
+        'hasPast':timezone.now() > event.event_time,
         'username':username,
         'inviteNewUserform':inviteNewUserForm,
 #        'messages': messages,

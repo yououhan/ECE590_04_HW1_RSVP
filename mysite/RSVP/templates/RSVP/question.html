@@ -26,11 +26,15 @@
       </div>
       {% endfor %}
       {% if isCreate != '1'%}
+      {% if not hasPast %}
       <button class="btn btn-primary" style="width:30%" name="changeQuestion" type="submit" value="changeQuestion">Change Question</button>
       <button class="btn btn-danger" style="width: 30%" name="deleteQ" type="submit" value="{{question.id}}" onclick="location='../../'">delete this question</button>
+      {% endif %}
       {% endif%}
       {% if isCreate == '1'%}
+      {% if not hasPast%}
       <button class="btn btn-primary" style="width:30%" name="changeQuestion" type="submit" value="changeQuestion">Add Question</button>
+      {% endif %}
       {% endif%}
     </form>
   </div>
@@ -42,7 +46,9 @@
       {% for c in choice%}
       <p>
 	{{c.choice_text}}
+      {% if not hasPast%}
 	<button class="btn btn-danger" style="width:10%" name="delete" type="submit" value="{{c.id}}">delete</button> 
+      {% endif %}
       </p>
       {% endfor%}
     </div>
@@ -66,7 +72,9 @@
 	{{field}}
       </div>
       {% endfor %}
+      {% if not hasPast%}
       <button class="btn btn-primary" style="width:100%" name="add_choice" type="submit" value="add_choice">add choice</button>
+      {% endif %}
     </form>
   </div>
   {% endif %}

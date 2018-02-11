@@ -1,3 +1,4 @@
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.core.mail import send_mail
 from .models import *
@@ -116,21 +117,24 @@ def saveResponses(requestPost, multiChoiceQuestions, textQuestions, registerEven
     # is funciton would create responses or update a old responses
     # of all the question for one guest of one event
     for question in multiChoiceQuestions:
-        if isPlusOne:
-            choice_selected=requestPost.get('plus_one_' + str(question.id))
-        else:
-            choice_selected=requestPost.get(str(question.id))
-        multiChoicesResponse, created = MultiChoicesResponse.objects.update_or_create(
-            question=question,
-            register_event=registerEvent,
-            is_plus_one=isPlusOne,
-            defaults={
-                'answer': Choice.objects.get(pk=choice_selected),
-                'last_updated_time': timezone.now(),
-                'is_plus_one': isPlusOne,
-            }
-        )
-        multiChoicesResponse.save()
+        try:
+            if isPlusOne:
+                choice_selected=requestPost.get('plus_one_' + str(question.id))
+            else:
+                choice_selected=requestPost.get(str(question.id))
+            multiChoicesResponse, created = MultiChoicesResponse.objects.update_or_create(
+                question=question,
+                register_event=registerEvent,
+                is_plus_one=isPlusOne,
+                defaults={
+                    'answer': Choice.objects.get(pk=choice_selected),
+                    'last_updated_time': timezone.now(),
+                    'is_plus_one': isPlusOne,
+                }
+            )
+            multiChoicesResponse.save()
+        except:
+            pass
     for question in textQuestions:
         if isPlusOne:
             answer_selected=requestPost.get('plus_one_' + str(question.id))
