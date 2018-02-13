@@ -1,0 +1,82 @@
+{% extends "RSVP/navbar.html" %}
+
+{% block title %}Question Details{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <h1>{{question.question_text}}</h1>
+  <div>
+    <form action="" method="post">
+      {%csrf_token%}
+      {% for error in form.non_field_errors %}
+      <div class="form-group has-errors text-danger small">
+	{{error}}
+      </div>
+      {% endfor %}
+      {% for field in Questionform %}
+      <div class="form-group has-errors text-danger small">
+	{{field.errors}}
+      </div>
+      <div class="form-group has-errors text-danger small">
+      </div>
+      <div class="form-group">
+	{{field.label}}
+	{{field}}
+      </div>
+      {% endfor %}
+      {% if isCreate != '1'%}
+      {% if not hasPast %}
+      <button class="btn btn-primary" style="width:30%" name="changeQuestion" type="submit" value="changeQuestion">Change Question</button>
+      <button class="btn btn-danger" style="width: 30%" name="deleteQ" type="submit" value="{{question.id}}" onclick="location='../../'">delete this question</button>
+      {% endif %}
+      {% endif%}
+      {% if isCreate == '1'%}
+      {% if not hasPast%}
+      <button class="btn btn-primary" style="width:30%" name="changeQuestion" type="submit" value="changeQuestion">Add Question</button>
+      {% endif %}
+      {% endif%}
+    </form>
+  </div>
+  {% if question.question_type != 'T' and isCreate != '1' %}
+  <h2>Choices</h2>
+  <form method="post" action="">
+    {%csrf_token%}
+    <div>
+      {% for c in choice%}
+      <p>
+	{{c.choice_text}}
+      {% if not hasPast%}
+	<button class="btn btn-danger" style="width:10%" name="delete" type="submit" value="{{c.id}}">delete</button> 
+      {% endif %}
+      </p>
+      {% endfor%}
+    </div>
+  </form>
+  <div style="width:30%">
+    <form action="" method="post">
+      {%csrf_token%}
+      {% for error in form.non_field_errors %}
+      <div class="form-group has-errors text-danger small">
+	{{error}}
+      </div>
+      {% endfor %}
+      {% for field in newChoiceform %}
+      <div class="form-group has-errors text-danger small">
+	{{field.errors}}
+      </div>
+      <div class="form-group has-errors text-danger small">
+      </div>
+      <div class="form-group">
+	{{field.label}}
+	{{field}}
+      </div>
+      {% endfor %}
+      {% if not hasPast%}
+      <button class="btn btn-primary" style="width:100%" name="add_choice" type="submit" value="add_choice">add choice</button>
+      {% endif %}
+    </form>
+  </div>
+  {% endif %}
+</div>
+{% endblock%}

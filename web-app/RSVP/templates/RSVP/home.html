@@ -1,0 +1,142 @@
+{% extends "RSVP/navbar.html" %}
+
+{% block title %}Home Page{% endblock %}
+
+{% block content %}
+
+<!--the username!!!!!!!!!!!!!!!!!-->
+<div class="container">
+  <div class="text-center">
+    <h1>{{username}}</h1>
+    <img src="https://cdn.bulbagarden.net/upload/thumb/e/e2/133Eevee.png/250px-133Eevee.png">
+  </div>
+  <hr>
+  
+  <!--the table of events!!!!!!!!!!!!!!!!!-->
+
+  <div class="row">
+    <div class="col-md-4">
+      <h2>Event you own</h2>
+      <h5>You've been invited to own those event</h5>
+      <p>you can accpet or decline those events </p>
+
+      {% for event in ownEventsPending %}
+      <p>
+	<form method="post" action="">
+	  {{event.event}}
+	  {%csrf_token%}
+	  <button type="submit" class="btn btn-primary" name="accept" value="{{event.id}}" type="submit">accept</button>
+	  <button type="submit" class="btn btn-danger" name="decline" value="{{event.id}}" type="submit">decline</button>
+	</form>
+      </p>
+      {% endfor %}
+    </div>
+    
+    <div class="col-md-4">
+      <h2>Event you guest</h2>
+      <h5>You've been invited to those event</h5>
+      <p>you can accpet or decline those events</p>
+
+      {% for event in guestPending %}
+      <p>
+	<form method="post" action="">
+	  {{event.event}}
+	  {%csrf_token%}
+	  <button type="submit" class="btn btn-primary" name="accept" value="{{event.id}}" type="submit">accept</button>
+	  <button type="submit" class="btn btn-danger" name="decline" value="{{event.id}}" type="submit">decline</button>
+	</form>
+      </p>
+      {% endfor %}
+    </div>
+
+    <div class="col-md-4">
+      <h2>Event you vendor</h2>
+      <h5>You've been invited to vendor those event</h5>
+      <p>you can accpet or decline those events</p>
+
+      {% for event in vendorPending %}
+      <p>
+	<form method="post" action="">
+	  {{event.event}}
+	  {%csrf_token%}
+	  <button type="submit" class="btn btn-primary" name="accept" value="{{event.id}}" type="submit">accept</button>
+	  <button type="submit" class="btn btn-danger" name="decline" value="{{event.id}}" type="submit">decline</button>
+	</form>
+      </p>
+      {% endfor %}      
+    </div>
+  </div> 
+</div> <!-- /container -->
+<hr>
+<div class="container">
+  <!-- Example row of columns -->
+  <div class="row">
+    <div class="col-md-4">
+      <h5>You own those event</h5>
+      <p>you can click to edit those events</p>
+      <p><a class="btn btn-secondary" href="{% url 'event create' %}" role="button">creat event &raquo;</a></p>  
+      {% for event in ownEvents %}
+      {% if event.event.event_time > timeNow %}
+      <p>{{timenow}}</p>
+      <p><a class="btn btn-secondary" href="{% url 'event detail' event.event.id %}" role="button">{{event.event}} &raquo;</a></p>
+      {% endif%}
+      {% endfor %}
+    </div>
+    
+    <div class="col-md-4">
+      <h5>You are in those event</h5>
+      <p>you can click to change your answer</p>
+      {% for event in guestEvents %}
+      {% if event.event.event_time > timeNow%}
+      <p><a class="btn btn-secondary" href="{% url 'question answer' event.event.id %}" role="button">{{event.event}} &raquo;</a></p>
+      {% endif%}
+      {% endfor %}
+    </div>
+
+    <div class="col-md-4">
+      <h5>You are the vendor to those event</h5>
+      <p>you can click to view those events</p>
+      {% for event in vendorEvents %}
+      {% if event.event.event_time > timeNow%}	
+      <p><a class="btn btn-secondary" href="{% url 'event detail' event.event.id %}" role="button">{{event.event}} &raquo;</a></p>
+      {% endif%}
+      {% endfor %}
+    </div>
+  </div> 
+</div> <!-- /container -->
+<hr>
+<div class="container">
+  <!-- Example row of columns -->
+  <div class="row">
+    <div class="col-md-4">
+      <h5>History owned event</h5>
+      <p>click to view more</p>
+      {% for event in ownEvents %}
+      {% if event.event.event_time < timeNow %}
+      <p><a class="btn btn-secondary" href="{% url 'event detail' event.event.id %}" role="button">{{event.event}} &raquo;</a></p>
+      {% endif %}
+      {% endfor %}
+    </div>
+    <div class="col-md-4">
+      <h5>History guest events</h5>
+      <p>click to view more</p>
+      {% for event in guestEvents %}
+      {% if event.event.event_time < timeNow %}
+      <p><a class="btn btn-secondary" href="{% url 'question answer' event.event.id %}" role="button">{{event.event}} &raquo;</a></p>
+      {% endif%}
+      {% endfor %}	
+    </div>
+
+    <div class="col-md-4">
+      <h5>History vendor event</h5>
+      <p>click to view more</p>      
+      {% for event in vendorEvents %}
+      {% if event.event.event_time < timeNow%}
+      <p><a class="btn btn-secondary" href="{% url 'event detail' event.event.id %}" role="button">{{event.event}} &raquo;</a></p>
+      {% endif%}
+      {% endfor %}	
+    </div>
+  </div> 
+  <hr>
+</div> <!-- /container -->
+{% endblock%}

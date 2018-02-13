@@ -1,7 +1,0 @@
-{% for questionStatistics in questionStatisticses %}
-{{questionStatistics.question.question_text}}
-{% if questionStatistics.question.question_type == 'S' %}
-{% endif %}
-{{questionStatistics.choi}}
-{% endfor %}
-{{}}
