@@ -1,2 +1,3 @@
- cd into the docker-deploy directory
- sudo docker-compose up
+1. Danger log and grate sheet are uploaded on sakai
+2. This RSVP web application is user-friendly.
+3. use sudo docker-compose up to run the test
